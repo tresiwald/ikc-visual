@@ -75,6 +75,9 @@ function init() {
 /** Init need tap eventplug of material-ui */
 injectTapEventPlugin();
 
+/**
+ *  maybe needed later?
+ *
 ReactDOM.render((
     <div id="wrapper">
         <MuiThemeProvider>
@@ -83,4 +86,6 @@ ReactDOM.render((
             </Paper>
         </MuiThemeProvider>
     </div>
-), document.getElementById("content"));
+), document.getElementById("ikc-visual"));
+
+    */
