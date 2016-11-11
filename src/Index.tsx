@@ -6,23 +6,29 @@ import * as injectTapEventPlugin from "react-tap-event-plugin";
 import {MuiThemeProvider} from "material-ui/styles";
 import getMuiTheme = __MaterialUI.Styles.getMuiTheme;
 import {Paper} from "material-ui";
-let Cytoscape = require('cytoscape');
+
 let dagre = require('dagre');
+let cydagre = require('cytoscape-dagre');
+let cytoscape = require('cytoscape');
+
+// register dependencies
+cydagre(cytoscape, dagre);
+
 import {View} from "ikc-visual-interfaces/src/common/interfaces/View";
 
 init();
 
 function init() {
 
-    let cy = (window as any).cy = Cytoscape({
+    let cy = (window as any).cy = cytoscape({
         container: document.getElementById('ikc-visual'),
 
         boxSelectionEnabled: false,
         autounselectify: true,
 
-        /*layout: {
+        layout: {
             name: 'dagre'
-        },*/
+        },
 
         style: [
             {
