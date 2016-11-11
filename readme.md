@@ -1,3 +1,8 @@
+**IKC-Visual (PAWI)**
+
+Prototyp of a graph visualization library.
+Mainly used in the existing ikc-core prototype.
+
 To start developing:
 
 npm install
