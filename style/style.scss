@@ -5,9 +5,7 @@ $default: "not screen and (min-width : 280px) and (max-width : 780px)";
 $grey: #DEDEDE;
 
 html{
-  background-color: #e4e4e4;
+
 }
 
-@import "header";
 @import "content";
-@import "footer";
