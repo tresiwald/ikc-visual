@@ -12,6 +12,7 @@ export default class GraphScreen extends React.Component<GraphScreenProps, {}> {
 
     constructor(props:any) {
         super(props);
+        this.initCytoscape();
     }
 
     initCytoscape() {
