@@ -12,10 +12,9 @@ export default class GraphScreen extends React.Component<GraphScreenProps, {}> {
 
     constructor(props:any) {
         super(props);
-        this.initCytoscape();
     }
 
-    initCytoscape() {
+    render() {
         let cy = (window as any).cy = cytoscape({
             container: document.getElementById('ikc-visual'),
 
