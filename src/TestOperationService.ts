@@ -1,4 +1,4 @@
-import {OperationService} from "ikc-visual-interfaces/src/common/interfaces/OperationService";
+import {OperationService} from "./interfaces/OperationService";
 
 export class TestOperationService implements OperationService {
 

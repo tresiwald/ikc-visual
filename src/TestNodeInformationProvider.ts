@@ -1,4 +1,4 @@
-import {NodeInformationProvider} from "ikc-visual-interfaces/src/common/interfaces/NodeInformationProvider";
+import {NodeInformationProvider} from "./interfaces/NodeInformationProvider";
 
 export class TestNodeInformationProvider implements NodeInformationProvider {
 
