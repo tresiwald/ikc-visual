@@ -1,9 +1,9 @@
 import {View} from "../../model/View";
 import {NodeInformationProvider} from "../../interfaces/NodeInformationProvider";
 import {OperationService} from "../../interfaces/OperationService";
-import {GraphElement} from "../../model/GraphElement";
-import {GraphNodeElement} from "../../model/GraphNodeData";
+import {GraphNodeElement, GraphNodeData} from "../../model/GraphNodeData";
 import {GraphArrowElement} from "../../model/GraphArrowData";
+import {DialogFactory} from "../../interfaces/DialogFactory";
 
 export interface  GraphScreenProps {
     viewToLoad: View;
@@ -11,11 +11,14 @@ export interface  GraphScreenProps {
     onViewDelete: Function;
     nodeInformationProvider: NodeInformationProvider;
     operationService: OperationService;
-    timestamp: string
+    timestamp: string;
+    dialogFactory: DialogFactory
 }
 
 export interface  GraphScreenStats {
     nodes?: GraphNodeElement[];
     arrows?: GraphArrowElement[];
-    timestamp?: string
+    timestamp?: string;
+    dialogNodeEditOpen?: boolean;
+    nodeToEdit?: GraphNodeData
 }

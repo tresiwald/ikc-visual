@@ -41,7 +41,7 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
                 {
                     selector: 'node',
                     style: {
-                        'content': 'data(id)',
+                        'content': 'data(label)',
                         'text-opacity': 0.5,
                         'text-valign': 'center',
                         'text-halign': 'right',
