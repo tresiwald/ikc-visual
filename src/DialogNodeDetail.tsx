@@ -1,12 +1,11 @@
 import * as React from "react";
 import {Dialog, FlatButton} from "material-ui";
 import {TextField} from "material-ui";
-import {DialogEditNodeProps, DialogEditNodeState} from "./interfaces/DialogEditNodeInterfaces";
+import {DialogNodeDetailProps, DialogNodeDetailState} from "./interfaces/DialogNodeDetailInterfaces";
 
+export class DialogNodeDetail extends React.Component<DialogNodeDetailProps, DialogNodeDetailState>{
 
-export class DialogEditNode extends React.Component<DialogEditNodeProps, DialogEditNodeState>{
-
-    constructor(props: DialogEditNodeProps) {
+    constructor(props: DialogNodeDetailProps) {
         super(props);
         this.state = {
             timestamp:""
@@ -96,7 +95,13 @@ export class DialogEditNode extends React.Component<DialogEditNodeProps, DialogE
                     underlineFocusStyle={styles.underlineStyle}
                     style={styles.textField}
                     onChange={this.handleInputUpdate}
-                />
+                /> <TextField
+                hintText="Node name..."
+                value={"Node name..."}
+                underlineFocusStyle={styles.underlineStyle}
+                style={styles.textField}
+                onChange={this.handleInputUpdate}
+            />
         </Dialog>
     );
     }

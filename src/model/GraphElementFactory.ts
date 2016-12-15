@@ -1,6 +1,6 @@
 import {GraphNodeData, GraphNodeElement} from "./GraphNodeData";
 import {GraphPosition} from "./GraphPosition";
-import {GraphArrowData, GraphArrowElement} from "./GraphArrowData";
+import {GraphLinkData, GraphLinkElement} from "./GraphLinkData";
 
 export function getGraphElementAsNode(id:string, label:string, position:GraphPosition):GraphNodeElement {
     return new GraphNodeElement(
@@ -8,10 +8,10 @@ export function getGraphElementAsNode(id:string, label:string, position:GraphPos
     )
 }
 
-export function getGraphElementAsArrow(sourceNode:string, destinationNode:string, label:string):GraphArrowElement {
-    return new GraphArrowElement(
-        new GraphArrowData(
-            sourceNode, destinationNode, label
+export function getGraphElementAsLink(id: string, sourceNode:string, destinationNode:string, label:string):GraphLinkElement {
+    return new GraphLinkElement(
+        new GraphLinkData(
+            id, sourceNode, destinationNode, label
         )
     )
 }

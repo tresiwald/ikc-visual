@@ -1,8 +1,9 @@
 import * as React from "react";
 import {GraphProps, GraphState} from "./GraphInterfaces";
+import * as GuidService from "../../common/GuidService"
 
 import * as GraphElementFactory from "../../model/GraphElementFactory"
-import {GraphArrowData} from "../../model/GraphArrowData";
+import {GraphLinkData} from "../../model/GraphLinkData";
 import {GraphPosition} from "../../model/GraphPosition";
 
 let dagre = require('dagre');
@@ -37,27 +38,27 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
                 name: 'preset'
             },
 
+
             style: [
                 {
                     selector: 'node',
                     style: {
                         'content': 'data(label)',
-                        'text-opacity': 0.5,
+                        'text-opacity': 0.8,
                         'text-valign': 'center',
                         'text-halign': 'right',
                         'background-color': '#11479e'
                     }
-                },
-
-                {
+                },{
                     selector: 'edge',
                     style: {
-                        'width': 4,
+                        'width': 3,
                         //'label': 'data(label)',
                         'target-arrow-shape': 'triangle',
                         'line-color': '#9dbaea',
                         'target-arrow-color': '#9dbaea',
-                        'curve-style': 'bezier'
+                        'curve-style': 'bezier',
+                        'edge-text-rotation': 'autorotate'
                     }
                 }
             ],
@@ -84,8 +85,8 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
 
                 if(targetNode.id()){
                     console.log("add arrow between" + node.id() + " and " + targetNode.id());
-                    that.props.onNewArrow(
-                        GraphElementFactory.getGraphElementAsArrow(node.id(),targetNode.id(),""),
+                    that.props.onNewLink(
+                        GraphElementFactory.getGraphElementAsLink(GuidService.getRandomGuid(),node.id(),targetNode.id(),""),
                         oldPos
                     )
                     that.state.oldPosition.delete(node.id())

@@ -6,8 +6,9 @@ import {ContextMenuCommand} from "../../model/ContextMenuCommand";
 import * as GraphElementFactory from "../../model/GraphElementFactory";
 import {GraphPosition} from "../../model/GraphPosition";
 import {GraphNodeElement} from "../../model/GraphNodeData";
-import {GraphArrowElement} from "../../model/GraphArrowData";
-import {DialogEditNodeState} from "../../interfaces/DialogEditNodeInterfaces";
+import {GraphLinkElement} from "../../model/GraphLinkData";
+import {DialogNodeDetailProps} from "../../interfaces/DialogNodeDetailInterfaces";
+import * as GuidService from "../../common/GuidService"
 
 
 export default class GraphScreen extends React.Component<GraphScreenProps, GraphScreenStats> {
@@ -23,26 +24,30 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
     initState = () => {
         if (this.state.timestamp != this.props.timestamp) {
             this.state.timestamp = this.props.timestamp
+
+            let node1 = GraphElementFactory.getGraphElementAsNode(GuidService.getRandomGuid(), 'home', new GraphPosition(100, 100))
+            let node2 = GraphElementFactory.getGraphElementAsNode(GuidService.getRandomGuid(), 'ikc', new GraphPosition(100, 200))
+            let node3 = GraphElementFactory.getGraphElementAsNode(GuidService.getRandomGuid(), 'pawi', new GraphPosition(200, 100))
+            let node4 = GraphElementFactory.getGraphElementAsNode(GuidService.getRandomGuid(), 'bda', new GraphPosition(200, 200))
+
             this.state.nodes = [
-                GraphElementFactory.getGraphElementAsNode('1', 'home', new GraphPosition(0, 0)),
-                GraphElementFactory.getGraphElementAsNode('2', 'ikc', new GraphPosition(0, 50)),
-                GraphElementFactory.getGraphElementAsNode('3', 'pawi', new GraphPosition(50, 0)),
-                GraphElementFactory.getGraphElementAsNode('4', 'bda', new GraphPosition(50, 50))
+               node1, node2, node3, node4
             ]
+
             this.state.arrows = [
-                GraphElementFactory.getGraphElementAsArrow('1', '2', 'project'),
-                GraphElementFactory.getGraphElementAsArrow('2', '1', 'backlink'),
-                GraphElementFactory.getGraphElementAsArrow('1', '3', 'project')
+                GraphElementFactory.getGraphElementAsLink(GuidService.getRandomGuid(), node1.data.id, node2.data.id, 'project'),
+                GraphElementFactory.getGraphElementAsLink(GuidService.getRandomGuid(), node2.data.id, node1.data.id, 'backlink'),
+                GraphElementFactory.getGraphElementAsLink(GuidService.getRandomGuid(), node1.data.id, node3.data.id, 'project')
             ]
         }
     }
 
-    onArrowCreated = (newArrow: GraphArrowElement, oldSourcePosition: GraphPosition) => {
+    onLinkCreated = (newLink: GraphLinkElement, oldSourcePosition: GraphPosition) => {
         let arrows = this.state.arrows
-        arrows.push(newArrow)
+        arrows.push(newLink)
         this.state.arrows = arrows
 
-        this.onNodePositionUpdated(newArrow.data.source, oldSourcePosition)
+        this.onNodePositionUpdated(newLink.data.source, oldSourcePosition)
     }
 
     onNodeCreated = (newNode: GraphNodeElement) => {
@@ -65,7 +70,7 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         })
     }
 
-    handleSaveNode = (state: DialogEditNodeState) => {
+    handleSaveNode = (state: DialogNodeDetailProps) => {
         let nodes = this.state.nodes
         nodes.forEach((node) => {
             if (node.data.id == state.node.id) {
@@ -74,6 +79,15 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         })
         this.state.nodes = nodes
         this.handleCloseDialogNodeEdit()
+    }
+
+    handleDeleteNode = (element: any) => {
+        let id = element.data().id
+
+        this.setState({
+            nodes: this.state.nodes.filter( (node) => node.data.id != id),
+            arrows: this.state.arrows.filter( (arrow) => (arrow.data.source != id && arrow.data.target != id))
+        })
     }
 
     handleCloseDialogNodeEdit = () => {
@@ -115,9 +129,7 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
             [
                 new ContextMenuCommand(
                     "Delete Node",
-                    () => {
-                        console.log("delete node clicked")
-                    }
+                    that.handleDeleteNode.bind(this)
                 ),
                 new ContextMenuCommand(
                     "Edit Node",
@@ -134,13 +146,13 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
                     coreMenu={coreMenu}
                     nodeMenu={nodeMenu}
                     onNewNode={this.onNodeCreated.bind(this)}
-                    onNewArrow={this.onArrowCreated.bind(this)}
+                    onNewLink={this.onLinkCreated.bind(this)}
                     onNodePositionUpdate={this.onNodePositionUpdated.bind(this)}
                 />
                 {(() => {
                     if (this.state.dialogNodeEditOpen) {
                         return (
-                            this.props.dialogFactory.getDialogNodeEdit(
+                            this.props.dialogFactory.getDialogNodeDetailAsEdit(
                                 this.state.dialogNodeEditOpen, this.handleSaveNode.bind(this), this.handleCloseDialogNodeEdit.bind(this), this.state.nodeToEdit
                             )
                         )

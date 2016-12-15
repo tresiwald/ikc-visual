@@ -8,7 +8,7 @@ export interface GraphProps {
     nodeMenu: ContextMenu
     coreMenu: ContextMenu
     onNewNode: Function
-    onNewArrow: Function
+    onNewLink: Function
     onNodePositionUpdate: Function
 }
 

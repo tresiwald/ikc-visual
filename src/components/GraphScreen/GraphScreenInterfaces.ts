@@ -2,7 +2,7 @@ import {View} from "../../model/View";
 import {NodeInformationProvider} from "../../interfaces/NodeInformationProvider";
 import {OperationService} from "../../interfaces/OperationService";
 import {GraphNodeElement, GraphNodeData} from "../../model/GraphNodeData";
-import {GraphArrowElement} from "../../model/GraphArrowData";
+import {GraphLinkElement} from "../../model/GraphLinkData";
 import {DialogFactory} from "../../interfaces/DialogFactory";
 
 export interface  GraphScreenProps {
@@ -17,7 +17,7 @@ export interface  GraphScreenProps {
 
 export interface  GraphScreenStats {
     nodes?: GraphNodeElement[];
-    arrows?: GraphArrowElement[];
+    arrows?: GraphLinkElement[];
     timestamp?: string;
     dialogNodeEditOpen?: boolean;
     nodeToEdit?: GraphNodeData
