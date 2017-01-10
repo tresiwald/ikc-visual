@@ -1,11 +1,15 @@
 import * as React from "react";
 import {Dialog, FlatButton} from "material-ui";
 import {TextField} from "material-ui";
-import {DialogNodeDetailProps, DialogNodeDetailState} from "./interfaces/DialogNodeDetailInterfaces";
+import {DialogNodeDetailProps} from "./interfaces/DialogNodeDetailInterfaces";
 import {GraphNodeData} from "./model/GraphNodeData";
 import {GuidService} from "./common/GuidService";
+import {
+    DialogNodeSearchToConnectProps,
+    DialogNodeSearchToConnectState
+} from "./interfaces/DialogNodeSearchToConnectInterfaces";
 
-export class DialogNodeDetail extends React.Component<DialogNodeDetailProps, DialogNodeDetailState>{
+export class DialogNodeSearchToConnect extends React.Component<DialogNodeSearchToConnectProps, DialogNodeSearchToConnectState>{
 
     constructor(props: DialogNodeDetailProps) {
         super(props);
@@ -17,11 +21,7 @@ export class DialogNodeDetail extends React.Component<DialogNodeDetailProps, Dia
     initState = () => {
         if (this.state.timestamp != this.props.timestamp) {
             this.state.timestamp = this.props.timestamp;
-            this.state.node = this.props.node;
-
-            if(this.props.asNewDialog){
-                this.state.node = new GraphNodeData(GuidService.getRandomGuid(),"")
-            }
+            this.state.node = new GraphNodeData(GuidService.getRandomGuid(), "")
         }
     }
 
@@ -33,11 +33,18 @@ export class DialogNodeDetail extends React.Component<DialogNodeDetailProps, Dia
         this.props.onRequestClose();
     }
 
-    handleInputUpdate = (event: any) => {
+
+    handleInputUpdateNode = (event: any) => {
         let node = this.state.node
         node.label = event.target.value
         this.setState({
-            node:node
+            node: node
+        })
+    };
+
+    handleInputUpdateLabel = (event: any) => {
+        this.setState({
+            label: event.target.value
         })
     };
 
@@ -96,11 +103,19 @@ export class DialogNodeDetail extends React.Component<DialogNodeDetailProps, Dia
                 style={styles.dialog} className="dialog">
 
                 <TextField
+                    hintText="Node label..."
+                    value={this.state.label}
+                    underlineFocusStyle={styles.underlineStyle}
+                    style={styles.textField}
+                    onChange={this.handleInputUpdateLabel}
+                />
+
+                <TextField
                     hintText="Node name..."
                     value={this.state.node.label}
                     underlineFocusStyle={styles.underlineStyle}
                     style={styles.textField}
-                    onChange={this.handleInputUpdate}
+                    onChange={this.handleInputUpdateNode}
                 />
         </Dialog>
     );

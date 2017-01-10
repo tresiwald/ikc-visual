@@ -1,19 +1,17 @@
 import * as React from "react";
 import {GraphProps, GraphState} from "./GraphInterfaces";
-import * as GuidService from "../../common/GuidService"
+import {GuidService} from "../../common/GuidService"
 
-import * as GraphElementFactory from "../../model/GraphElementFactory"
-import {GraphLinkData} from "../../model/GraphLinkData";
+import {GraphElementFactory} from "../../model/GraphElementFactory"
 import {GraphPosition} from "../../model/GraphPosition";
 
-let dagre = require('dagre');
-let cydagre = require('cytoscape-dagre');
 let cytoscape = require('cytoscape');
 let cytoscapeCtxmenu = require('cytoscape-cxtmenu');
+let cytoscapeAutomove = require('cytoscape-automove');
 
 // register dependencies
-cydagre(cytoscape, dagre);
-cytoscapeCtxmenu(cytoscape, dagre);
+cytoscapeCtxmenu(cytoscape);
+cytoscapeAutomove(cytoscape);
 
 export default class Graph extends React.Component<GraphProps, GraphState> {
 
@@ -22,22 +20,25 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
     constructor(props:any) {
         super(props);
         this.state = {
-            oldPosition: new Map<string, GraphPosition>()
+            oldPosition: new Map<string, GraphPosition>(),
+            pan: new GraphPosition(0,0)
         }
     }
 
     renderCytoscapeElement(){
         let that = this
+
         this.cy = (window as any).cy = cytoscape({
             container: document.getElementById('ikc-visual'),
 
-            boxSelectionEnabled: false,
-            autounselectify: true,
+            pan: this.state.pan,
+
 
             layout: {
-                name: 'preset'
+                name: 'preset',
+                fit: false,
+                pan: 2,
             },
-
 
             style: [
                 {
@@ -52,24 +53,46 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
                 },{
                     selector: 'edge',
                     style: {
-                        'width': 3,
+                        'width': 1,
                         //'label': 'data(label)',
                         'target-arrow-shape': 'triangle',
                         'line-color': '#9dbaea',
                         'target-arrow-color': '#9dbaea',
                         'curve-style': 'bezier',
+                        'control-point-step-size': 1,
                         'edge-text-rotation': 'autorotate'
+                    }
+                },{
+                    selector: '.tmp',
+                    style: {
+                        'content': 'data(label)',
+                        'text-opacity': 0.8,
+                        'text-valign': 'center',
+                        'text-halign': 'right',
+                        'background-color': '#6299c4'
                     }
                 }
             ],
 
             elements: {
                 nodes: that.props.nodes,
-                edges: that.props.arrows
+                edges: that.props.links
             },
 
         });
 
+        this.cy.on('taphold', function(e:any){
+            that.cy.position = e.cyPosition
+        })
+
+        this.cy.on('pan', function(e:any){
+            that.state.pan = e.cy.pan()
+        })
+
+        this.cy.on('add', function (e:any){
+            console.log('added')
+            console.log(e)
+        })
 
         this.cy.nodes().on('grab', function(e:any) {
 
@@ -84,7 +107,7 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
                 });
 
                 if(targetNode.id()){
-                    console.log("add arrow between" + node.id() + " and " + targetNode.id());
+                    console.log("add link between" + node.id() + " and " + targetNode.id());
                     that.props.onNewLink(
                         GraphElementFactory.getGraphElementAsLink(GuidService.getRandomGuid(),node.id(),targetNode.id(),""),
                         oldPos
@@ -103,6 +126,8 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
         });
         this.cy.cxtmenu(this.props.coreMenu);
         this.cy.cxtmenu(this.props.nodeMenu);
+
+
     }
     componentDidUpdate(){
         this.renderCytoscapeElement();
@@ -120,9 +145,72 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
         return false;
     }
 
+    calcNodePosition(radius:number, angle:number, source: GraphPosition):GraphPosition{
+        let pos = new GraphPosition(
+            Math.round(source.x + radius * Math.cos((Math.PI / 180) * angle)),
+            Math.round(source.y + radius * Math.sin((Math.PI / 180) * angle))
+        )
+        return pos
+    }
+
+    externalDrop(event:any){
+        let that = this
+        let tmpNodePosition = this.cy.$('#tmp').position()
+
+        this.cy.$('#tmp').remove()
+
+        this.cy.nodes().forEach((node:any) => {
+            if(that.close(tmpNodePosition, node.position())){
+                this.props.onNewNode(
+                    GraphElementFactory.getGraphElementAsNode(
+                        event.dataTransfer.getData("id"),
+                        event.dataTransfer.getData("label"),
+                        that.calcNodePosition(100, Math.random() * 360, node.position())
+                    )
+                )
+                this.props.onNewLink(
+                    GraphElementFactory.getGraphElementAsLink(GuidService.getRandomGuid(),node.id(),event.dataTransfer.getData("id"),""),
+                    node.position()
+                )
+            }
+        })
+
+        this.props.onNewNode(
+            GraphElementFactory.getGraphElementAsNode(
+                event.dataTransfer.getData("id"),
+                event.dataTransfer.getData("label"),
+                tmpNodePosition
+            )
+        )
+
+    }
+
+    onDragOver(e:any) {
+        let canvas = document.getElementById('ikc-visual')
+
+        if(this.cy.$('#tmp').length > 0){
+            this.cy.$('#tmp').position({
+                x: e.clientX - canvas.getBoundingClientRect().left - this.state.pan.x,
+                y: e.clientY - canvas.getBoundingClientRect().top - this.state.pan.y
+            });
+        }else{
+            this.cy.add({
+                group: "nodes",
+                data: {id: "tmp"},
+                classes: "tmp",
+                renderedPosition: {
+                    x: e.clientX - canvas.getBoundingClientRect().left - this.state.pan.x,
+                    y: e.clientY - canvas.getBoundingClientRect().top - this.state.pan.y
+                }
+            });
+        }
+        console.log(e.dataTransfer.getData("id"))
+        e.preventDefault();
+    }
+
     render() {
         return(
-            <div id="ikc-visual"></div>
+            <div onDrop={this.externalDrop.bind(this)} onDragOver={this.onDragOver.bind(this)} id="ikc-visual"></div>
         )
     }
 

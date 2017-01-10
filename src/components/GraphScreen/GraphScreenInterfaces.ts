@@ -4,6 +4,7 @@ import {OperationService} from "../../interfaces/OperationService";
 import {GraphNodeElement, GraphNodeData} from "../../model/GraphNodeData";
 import {GraphLinkElement} from "../../model/GraphLinkData";
 import {DialogFactory} from "../../interfaces/DialogFactory";
+import {GraphPosition} from "../../model/GraphPosition";
 
 export interface  GraphScreenProps {
     viewToLoad: View;
@@ -17,8 +18,14 @@ export interface  GraphScreenProps {
 
 export interface  GraphScreenStats {
     nodes?: GraphNodeElement[];
-    arrows?: GraphLinkElement[];
+    links?: GraphLinkElement[];
     timestamp?: string;
-    dialogNodeEditOpen?: boolean;
-    nodeToEdit?: GraphNodeData
+    dialogEditNodeOpen?: boolean;
+    dialogNewNodeOpen?: boolean;
+    dialogSearchNodeOpen?: boolean;
+    dialogNewNodeToConnectOpen?: boolean;
+    dialogSearchNodeToConnectOpen?: boolean;
+    nodeToEdit?: GraphNodeData;
+    nodeToConnect?: GraphNodeData;
+    tappedPosition?: GraphPosition;
 }

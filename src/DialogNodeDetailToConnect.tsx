@@ -4,8 +4,12 @@ import {TextField} from "material-ui";
 import {DialogNodeDetailProps, DialogNodeDetailState} from "./interfaces/DialogNodeDetailInterfaces";
 import {GraphNodeData} from "./model/GraphNodeData";
 import {GuidService} from "./common/GuidService";
+import {
+    DialogNodeDetailToConnectProps,
+    DialogNodeDetailToConnectState
+} from "./interfaces/DialogNodeDetailInterfacesToConnect";
 
-export class DialogNodeDetail extends React.Component<DialogNodeDetailProps, DialogNodeDetailState>{
+export class DialogNodeDetailToConnect extends React.Component<DialogNodeDetailToConnectProps, DialogNodeDetailToConnectState>{
 
     constructor(props: DialogNodeDetailProps) {
         super(props);
@@ -33,13 +37,20 @@ export class DialogNodeDetail extends React.Component<DialogNodeDetailProps, Dia
         this.props.onRequestClose();
     }
 
-    handleInputUpdate = (event: any) => {
+    handleInputUpdateNode = (event: any) => {
         let node = this.state.node
         node.label = event.target.value
         this.setState({
-            node:node
+            node: node
         })
     };
+
+    handleInputUpdateLabel = (event: any) => {
+        this.setState({
+            label: event.target.value
+        })
+    };
+
 
     render() {
         this.initState()
@@ -96,11 +107,18 @@ export class DialogNodeDetail extends React.Component<DialogNodeDetailProps, Dia
                 style={styles.dialog} className="dialog">
 
                 <TextField
+                    hintText="Link label..."
+                    value={this.state.label}
+                    underlineFocusStyle={styles.underlineStyle}
+                    style={styles.textField}
+                    onChange={this.handleInputUpdateLabel}
+                />
+                <TextField
                     hintText="Node name..."
                     value={this.state.node.label}
                     underlineFocusStyle={styles.underlineStyle}
                     style={styles.textField}
-                    onChange={this.handleInputUpdate}
+                    onChange={this.handleInputUpdateNode}
                 />
         </Dialog>
     );

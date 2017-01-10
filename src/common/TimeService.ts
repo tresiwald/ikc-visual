@@ -1,3 +1,5 @@
-export function getTimestamp(): string {
-    return (new Date).getTime().toString()
+export module TimeService{
+    export function getTimestamp(): string {
+        return (new Date).getTime().toString()
+    }
 }

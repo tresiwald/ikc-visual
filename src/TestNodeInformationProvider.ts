@@ -1,4 +1,5 @@
 import {NodeInformationProvider} from "./interfaces/NodeInformationProvider";
+import {GraphNodeData} from "./model/GraphNodeData";
 
 export class TestNodeInformationProvider implements NodeInformationProvider {
 
@@ -10,4 +11,17 @@ export class TestNodeInformationProvider implements NodeInformationProvider {
         return undefined;
     }
 
+
+    getChildsOfNode(id: string): GraphNodeData[] {
+        let returnArr = []
+        let rand = Math.random()*8
+        for(var i = 0; i<rand; i++ ){
+            returnArr.push(
+                new GraphNodeData(
+                    i.toString(), i.toString()
+                )
+            )
+        }
+        return returnArr
+    }
 }

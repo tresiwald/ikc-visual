@@ -1,11 +1,11 @@
 import {GraphElement} from "./GraphElement";
 export class View{
     nodes: GraphElement[]
-    arrows: GraphElement[]
+    links: GraphElement[]
 
-    constructor(nodes:GraphElement[], arrows:GraphElement[]){
+    constructor(nodes:GraphElement[], links:GraphElement[]){
         this.nodes = nodes
-        this.arrows = arrows
+        this.links = links
     }
 
     toJson():string {

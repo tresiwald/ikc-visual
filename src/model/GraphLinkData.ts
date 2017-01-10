@@ -1,4 +1,3 @@
-import {GraphPosition} from "./GraphPosition";
 import {GraphElement, GraphElementData} from "./GraphElement";
 
 export class GraphLinkElement implements GraphElement{

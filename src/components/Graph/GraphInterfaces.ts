@@ -4,7 +4,7 @@ import {GraphPosition} from "../../model/GraphPosition";
 
 export interface GraphProps {
     nodes: GraphElement[]
-    arrows: GraphElement[]
+    links: GraphElement[]
     nodeMenu: ContextMenu
     coreMenu: ContextMenu
     onNewNode: Function
@@ -14,4 +14,5 @@ export interface GraphProps {
 
 export interface GraphState {
     oldPosition?: Map<string, GraphPosition>
+    pan?: GraphPosition
 }

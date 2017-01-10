@@ -4,8 +4,9 @@ import {TextField} from "material-ui";
 import {DialogNodeDetailProps, DialogNodeDetailState} from "./interfaces/DialogNodeDetailInterfaces";
 import {GraphNodeData} from "./model/GraphNodeData";
 import {GuidService} from "./common/GuidService";
+import {DialogNodeSearchProps, DialogNodeSearchState} from "./interfaces/DialogNodeSearchInterfaces";
 
-export class DialogNodeDetail extends React.Component<DialogNodeDetailProps, DialogNodeDetailState>{
+export class DialogNodeSearch extends React.Component<DialogNodeSearchProps, DialogNodeSearchState>{
 
     constructor(props: DialogNodeDetailProps) {
         super(props);
@@ -17,11 +18,7 @@ export class DialogNodeDetail extends React.Component<DialogNodeDetailProps, Dia
     initState = () => {
         if (this.state.timestamp != this.props.timestamp) {
             this.state.timestamp = this.props.timestamp;
-            this.state.node = this.props.node;
-
-            if(this.props.asNewDialog){
-                this.state.node = new GraphNodeData(GuidService.getRandomGuid(),"")
-            }
+            this.state.node = new GraphNodeData(GuidService.getRandomGuid(), "")
         }
     }
 

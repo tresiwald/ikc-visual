@@ -3,21 +3,22 @@ import {GraphScreenProps, GraphScreenStats} from "./GraphScreenInterfaces";
 import Graph from "../Graph/Graph";
 import {ContextMenu} from "../../model/ContextMenu";
 import {ContextMenuCommand} from "../../model/ContextMenuCommand";
-import * as GraphElementFactory from "../../model/GraphElementFactory";
+import {GraphElementFactory} from "../../model/GraphElementFactory";
 import {GraphPosition} from "../../model/GraphPosition";
 import {GraphNodeElement} from "../../model/GraphNodeData";
 import {GraphLinkElement} from "../../model/GraphLinkData";
 import {DialogNodeDetailProps} from "../../interfaces/DialogNodeDetailInterfaces";
-import * as GuidService from "../../common/GuidService"
-
+import {GuidService} from "../../common/GuidService";
+import {DialogNodeDetailToConnectState} from "../../interfaces/DialogNodeDetailInterfacesToConnect";
+import {DialogNodeSearchToConnectState} from "../../interfaces/DialogNodeSearchToConnectInterfaces";
 
 export default class GraphScreen extends React.Component<GraphScreenProps, GraphScreenStats> {
     constructor(props: any) {
         super(props);
         this.state = {
             nodes: [],
-            arrows: [],
-            dialogNodeEditOpen: false
+            links: [],
+            dialogEditNodeOpen: false
         }
     }
 
@@ -25,28 +26,15 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         if (this.state.timestamp != this.props.timestamp) {
             this.state.timestamp = this.props.timestamp
 
-            let node1 = GraphElementFactory.getGraphElementAsNode(GuidService.getRandomGuid(), 'home', new GraphPosition(100, 100))
-            let node2 = GraphElementFactory.getGraphElementAsNode(GuidService.getRandomGuid(), 'ikc', new GraphPosition(100, 200))
-            let node3 = GraphElementFactory.getGraphElementAsNode(GuidService.getRandomGuid(), 'pawi', new GraphPosition(200, 100))
-            let node4 = GraphElementFactory.getGraphElementAsNode(GuidService.getRandomGuid(), 'bda', new GraphPosition(200, 200))
-
-            this.state.nodes = [
-               node1, node2, node3, node4
-            ]
-
-            this.state.arrows = [
-                GraphElementFactory.getGraphElementAsLink(GuidService.getRandomGuid(), node1.data.id, node2.data.id, 'project'),
-                GraphElementFactory.getGraphElementAsLink(GuidService.getRandomGuid(), node2.data.id, node1.data.id, 'backlink'),
-                GraphElementFactory.getGraphElementAsLink(GuidService.getRandomGuid(), node1.data.id, node3.data.id, 'project')
-            ]
+            this.state.nodes = this.props.viewToLoad.nodes as GraphNodeElement[]
+            this.state.links = this.props.viewToLoad.links as GraphLinkElement[]
         }
     }
 
     onLinkCreated = (newLink: GraphLinkElement, oldSourcePosition: GraphPosition) => {
-        let arrows = this.state.arrows
-        arrows.push(newLink)
-        this.state.arrows = arrows
-
+        let links = this.state.links
+        links.push(newLink)
+        this.state.links = links
         this.onNodePositionUpdated(newLink.data.source, oldSourcePosition)
     }
 
@@ -72,35 +60,147 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
 
     handleSaveNode = (state: DialogNodeDetailProps) => {
         let nodes = this.state.nodes
+
         nodes.forEach((node) => {
             if (node.data.id == state.node.id) {
                 node.data = state.node
             }
         })
         this.state.nodes = nodes
-        this.handleCloseDialogNodeEdit()
+        this.handleCloseDialogEditNode()
+    }
+
+    handleAddNewNode = (state: DialogNodeDetailProps) => {
+        let nodes = this.state.nodes
+        nodes.push(GraphElementFactory.getNode(state.node, this.state.tappedPosition))
+
+        this.setState({
+            nodes: nodes,
+            dialogNewNodeOpen: false
+        })
+    }
+
+    handleAddExistingNode = (state: DialogNodeDetailProps) => {
+        let nodes = this.state.nodes
+        nodes.push(GraphElementFactory.getNode(state.node, this.state.tappedPosition))
+
+        this.setState({
+            nodes: nodes,
+            dialogSearchNodeOpen: false
+        })
+    }
+
+    handleAddNewNodeWithLink = (state: DialogNodeDetailToConnectState) => {
+        let nodes = this.state.nodes
+        nodes.push(GraphElementFactory.getNode(
+            state.node, new GraphPosition(this.state.tappedPosition.x + 10, this.state.tappedPosition.y + 10))
+        )
+
+        let links = this.state.links
+        links.push(GraphElementFactory.getGraphElementAsLink(
+            GuidService.getRandomGuid(),this.state.nodeToConnect.id, state.node.id, state.label
+        ))
+
+        this.setState({
+            nodes: nodes,
+            links: links,
+            dialogNewNodeToConnectOpen: false
+        })
+    }
+
+    handleAddExistingNodeWithLink = (state: DialogNodeSearchToConnectState) => {
+        let nodes = this.state.nodes
+        nodes.push(GraphElementFactory.getNode(
+            state.node, new GraphPosition(this.state.tappedPosition.x + 40, this.state.tappedPosition.y + 40))
+        )
+
+        let links = this.state.links
+        links.push(GraphElementFactory.getGraphElementAsLink(
+            GuidService.getRandomGuid(),this.state.nodeToConnect.id, state.node.id, state.label
+        ))
+
+        this.setState({
+            nodes: nodes,
+            links: links,
+            dialogSearchNodeToConnectOpen: false
+        })
     }
 
     handleDeleteNode = (element: any) => {
         let id = element.data().id
 
         this.setState({
-            nodes: this.state.nodes.filter( (node) => node.data.id != id),
-            arrows: this.state.arrows.filter( (arrow) => (arrow.data.source != id && arrow.data.target != id))
+            nodes: this.state.nodes.filter((node) => node.data.id != id),
+            links: this.state.links.filter((link) => (link.data.source != id && link.data.target != id))
         })
     }
 
-    handleCloseDialogNodeEdit = () => {
+    handleCloseDialogEditNode = () => {
         this.setState({
-            dialogNodeEditOpen: false
+            dialogEditNodeOpen: false
         })
     }
 
-    handleOpenDialogNodeEdit = (element: any) => {
+    handleOpenDialogEditNode = (element: any) => {
         console.log(element)
         this.setState({
-            dialogNodeEditOpen: true,
+            dialogEditNodeOpen: true,
             nodeToEdit: element.data()
+        })
+    }
+
+    handleCloseDialogNewNode = () => {
+        this.setState({
+            dialogNewNodeOpen: false
+        })
+    }
+
+    handleOpenDialogNewNode = (element: any) => {
+        this.setState({
+            dialogNewNodeOpen: true,
+            tappedPosition: element.position
+        })
+    }
+
+    handleCloseDialogSearchNode = () => {
+        this.setState({
+            dialogSearchNodeOpen: false
+        })
+    }
+
+    handleOpenDialogSearchNode = (element: any) => {
+        this.setState({
+            dialogNewNodeToConnectOpen: true,
+            tappedPosition: element.position
+        })
+    }
+
+
+    handleCloseDialogNewNodeToConnect = () => {
+        this.setState({
+            dialogNewNodeToConnectOpen: false
+        })
+    }
+
+    handleOpenDialogNewNodeToConnect = (element: any) => {
+        this.setState({
+            dialogNewNodeToConnectOpen: true,
+            tappedPosition: element.position(),
+            nodeToConnect: element.data()
+        })
+    }
+
+    handleCloseDialogSearchNodeToConnect = () => {
+        this.setState({
+            dialogSearchNodeToConnectOpen: false
+        })
+    }
+
+    handleOpenDialogSearchNodeToConnect = (element: any) => {
+        this.setState({
+            dialogSearchNodeToConnectOpen: true,
+            tappedPosition: element.position(),
+            nodeToConnect:  element.data()
         })
     }
 
@@ -112,15 +212,11 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
             [
                 new ContextMenuCommand(
                     "Add New Node",
-                    () => {
-                        console.log("add new node clicked")
-                    }
+                    that.handleOpenDialogNewNode.bind(that)
                 ),
                 new ContextMenuCommand(
                     "Add existing Node",
-                    () => {
-                        console.log("add existing node clicked")
-                    }
+                    that.handleOpenDialogSearchNode.bind(that)
                 ),
             ]
         )
@@ -128,12 +224,24 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
             "node",
             [
                 new ContextMenuCommand(
+                    "Hide Node",
+                    that.handleDeleteNode.bind(that)
+                ),
+                new ContextMenuCommand(
                     "Delete Node",
-                    that.handleDeleteNode.bind(this)
+                    that.handleDeleteNode.bind(that)
                 ),
                 new ContextMenuCommand(
                     "Edit Node",
-                    that.handleOpenDialogNodeEdit.bind(this)
+                    that.handleOpenDialogEditNode.bind(that)
+                ),
+                new ContextMenuCommand(
+                    "Link to new Node",
+                    that.handleOpenDialogNewNodeToConnect.bind(that)
+                ),
+                new ContextMenuCommand(
+                    "Link to existing Node",
+                    that.handleOpenDialogSearchNodeToConnect.bind(that)
                 ),
             ]
         )
@@ -142,7 +250,7 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
             <div>
                 <Graph
                     nodes={this.state.nodes}
-                    arrows={this.state.arrows}
+                    links={this.state.links}
                     coreMenu={coreMenu}
                     nodeMenu={nodeMenu}
                     onNewNode={this.onNodeCreated.bind(this)}
@@ -150,10 +258,38 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
                     onNodePositionUpdate={this.onNodePositionUpdated.bind(this)}
                 />
                 {(() => {
-                    if (this.state.dialogNodeEditOpen) {
+                    if (this.state.dialogEditNodeOpen) {
                         return (
                             this.props.dialogFactory.getDialogNodeDetailAsEdit(
-                                this.state.dialogNodeEditOpen, this.handleSaveNode.bind(this), this.handleCloseDialogNodeEdit.bind(this), this.state.nodeToEdit
+                                this.state.dialogEditNodeOpen, this.handleSaveNode.bind(this), this.handleCloseDialogEditNode.bind(this), this.state.nodeToEdit
+                            )
+                        )
+                    }
+                    if (this.state.dialogNewNodeOpen) {
+                        return (
+                            this.props.dialogFactory.getDialogNodeDetailAsNew(
+                                this.state.dialogNewNodeOpen, this.handleAddNewNode.bind(this), this.handleCloseDialogNewNode.bind(this)
+                            )
+                        )
+                    }
+                    if (this.state.dialogSearchNodeOpen) {
+                        return (
+                            this.props.dialogFactory.getDialogNodeSearch(
+                                this.state.dialogSearchNodeOpen, this.handleAddExistingNode.bind(this), this.handleCloseDialogSearchNode.bind(this)
+                            )
+                        )
+                    }
+                    if (this.state.dialogNewNodeToConnectOpen) {
+                        return (
+                            this.props.dialogFactory.getDialogNodeDetailAsNewToConnect(
+                                this.state.dialogNewNodeToConnectOpen, this.handleAddNewNodeWithLink.bind(this), this.handleCloseDialogNewNodeToConnect.bind(this)
+                            )
+                        )
+                    }
+                    if (this.state.dialogSearchNodeToConnectOpen) {
+                        return (
+                            this.props.dialogFactory.getDialogNodeSearchToConnect(
+                                this.state.dialogSearchNodeToConnectOpen, this.handleAddExistingNodeWithLink.bind(this), this.handleCloseDialogSearchNodeToConnect.bind(this)
                             )
                         )
                     }
