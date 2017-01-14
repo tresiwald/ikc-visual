@@ -15,7 +15,7 @@ import {VISIBILITY} from "../../model/VISIBILITY";
 import ExpandDialog from "../ExpandDialog/ExpandDialog";
 import {TimeService} from "../../common/TimeService";
 
-export class GraphScreen extends React.Component<GraphScreenProps, GraphScreenStats> {
+export default class GraphScreen extends React.Component<GraphScreenProps, GraphScreenStats> {
     constructor(props: any) {
         super(props);
         this.state = {
