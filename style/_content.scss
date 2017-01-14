@@ -6,3 +6,20 @@
   top: 0;
   left: 0;
 }
+#toolbar{
+  margin: 100px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: grey;
+  font-size: 30px;
+  font-weight: bold;
+}
+
+#expandPaper{
+  padding: 20px;
+  width: 300px;
+  margin: 100px;
+  z-index: 9999999;
+  position: absolute;
+}

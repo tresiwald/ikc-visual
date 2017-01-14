@@ -1,8 +1,8 @@
 import * as React from "react";
-
-
 export interface TestDragProps{}
 export interface TestDragState{}
+
+declare function registerDragZone(id:String):any
 
 export default class TestDrag extends React.Component<TestDragProps, TestDragState>{
     constructor(props: any) {
@@ -11,12 +11,12 @@ export default class TestDrag extends React.Component<TestDragProps, TestDragSta
 
     onDrag(e:any){
         let random = Math.round(Math.random() * 100)
-        e.dataTransfer.setData("id", random.toString())
-        e.dataTransfer.setData("label", "Node " + random.toString())
+        registerDragZone(random.toString())
     }
+
     render() {
         return (
-                <div draggable={true} onDragStart={this.onDrag.bind(this)}>New Node</div>
+                <div draggable={true} onDragStart={this.onDrag.bind(this)} className={"mobileDraggable id-" + (Math.round(Math.random() * 100))} >New Node</div>
         )
     }
 }

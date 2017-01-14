@@ -17,8 +17,8 @@ export interface  GraphScreenProps {
 }
 
 export interface  GraphScreenStats {
-    nodes?: GraphNodeElement[];
-    links?: GraphLinkElement[];
+    nodes?: Map<string, GraphNodeElement>;
+    links?: Map<string, GraphLinkElement>;
     timestamp?: string;
     dialogEditNodeOpen?: boolean;
     dialogNewNodeOpen?: boolean;
@@ -28,4 +28,6 @@ export interface  GraphScreenStats {
     nodeToEdit?: GraphNodeData;
     nodeToConnect?: GraphNodeData;
     tappedPosition?: GraphPosition;
+    filterWindowOpen?: boolean;
+    filterWindowNode?:GraphNodeElement;
 }

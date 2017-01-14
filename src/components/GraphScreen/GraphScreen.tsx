@@ -6,18 +6,21 @@ import {ContextMenuCommand} from "../../model/ContextMenuCommand";
 import {GraphElementFactory} from "../../model/GraphElementFactory";
 import {GraphPosition} from "../../model/GraphPosition";
 import {GraphNodeElement} from "../../model/GraphNodeData";
-import {GraphLinkElement} from "../../model/GraphLinkData";
+import {GraphLinkElement, GraphLinkData} from "../../model/GraphLinkData";
 import {DialogNodeDetailProps} from "../../interfaces/DialogNodeDetailInterfaces";
 import {GuidService} from "../../common/GuidService";
 import {DialogNodeDetailToConnectState} from "../../interfaces/DialogNodeDetailInterfacesToConnect";
 import {DialogNodeSearchToConnectState} from "../../interfaces/DialogNodeSearchToConnectInterfaces";
+import {VISIBILITY} from "../../model/VISIBILITY";
+import ExpandDialog from "../ExpandDialog/ExpandDialog";
+import {TimeService} from "../../common/TimeService";
 
 export default class GraphScreen extends React.Component<GraphScreenProps, GraphScreenStats> {
     constructor(props: any) {
         super(props);
         this.state = {
-            nodes: [],
-            links: [],
+            nodes: new Map<string, GraphNodeElement>(),
+            links: new Map<string, GraphLinkElement>(),
             dialogEditNodeOpen: false
         }
     }
@@ -26,21 +29,25 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         if (this.state.timestamp != this.props.timestamp) {
             this.state.timestamp = this.props.timestamp
 
-            this.state.nodes = this.props.viewToLoad.nodes as GraphNodeElement[]
-            this.state.links = this.props.viewToLoad.links as GraphLinkElement[]
+            let nodes = new Map<string, GraphNodeElement>()
+            let links = new Map<string, GraphLinkElement>()
+
+            this.props.viewToLoad.nodes.forEach((node) => nodes.set(node.data.id,node))
+            this.props.viewToLoad.links.forEach((link) => links.set(link.data.id,link))
+
+            this.state.nodes = nodes
+            this.state.links = links
         }
     }
 
     onLinkCreated = (newLink: GraphLinkElement, oldSourcePosition: GraphPosition) => {
-        let links = this.state.links
-        links.push(newLink)
-        this.state.links = links
+        this.state.links.set(newLink.data.id, newLink)
         this.onNodePositionUpdated(newLink.data.source, oldSourcePosition)
     }
 
     onNodeCreated = (newNode: GraphNodeElement) => {
         let nodes = this.state.nodes
-        nodes.push(newNode)
+        nodes.set(newNode.data.id, newNode)
         this.setState({
             nodes: nodes
         })
@@ -48,11 +55,11 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
 
     onNodePositionUpdated = (nodeId: string, position: GraphPosition) => {
         let nodes = this.state.nodes
-        nodes.forEach((node) => {
-            if (node.data.id == nodeId) {
-                node.position = position
-            }
-        })
+        let node = nodes.get(nodeId)
+
+        node.position = position
+        nodes.set(nodeId, node)
+
         this.setState({
             nodes: nodes
         })
@@ -72,7 +79,8 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
 
     handleAddNewNode = (state: DialogNodeDetailProps) => {
         let nodes = this.state.nodes
-        nodes.push(GraphElementFactory.getNode(state.node, this.state.tappedPosition))
+        let node = GraphElementFactory.getNode(state.node, this.state.tappedPosition, VISIBILITY.VISIBLE)
+        nodes.set(node.data.id, node)
 
         this.setState({
             nodes: nodes,
@@ -82,7 +90,8 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
 
     handleAddExistingNode = (state: DialogNodeDetailProps) => {
         let nodes = this.state.nodes
-        nodes.push(GraphElementFactory.getNode(state.node, this.state.tappedPosition))
+        let node = GraphElementFactory.getNode(state.node, this.state.tappedPosition, VISIBILITY.VISIBLE)
+        nodes.set(node.data.id, node)
 
         this.setState({
             nodes: nodes,
@@ -92,14 +101,16 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
 
     handleAddNewNodeWithLink = (state: DialogNodeDetailToConnectState) => {
         let nodes = this.state.nodes
-        nodes.push(GraphElementFactory.getNode(
-            state.node, new GraphPosition(this.state.tappedPosition.x + 10, this.state.tappedPosition.y + 10))
-        )
+        let node = GraphElementFactory.getNode(
+            state.node, new GraphPosition(this.state.tappedPosition.x + 10, this.state.tappedPosition.y + 10), VISIBILITY.VISIBLE)
+
+        nodes.set(node.data.id, node)
 
         let links = this.state.links
-        links.push(GraphElementFactory.getGraphElementAsLink(
-            GuidService.getRandomGuid(),this.state.nodeToConnect.id, state.node.id, state.label
-        ))
+        let link = GraphElementFactory.getGraphElementAsLink(
+            GuidService.getRandomGuid(), this.state.nodeToConnect.id, state.node.id, state.label, VISIBILITY.VISIBLE)
+
+        links.set(link.data.id, link)
 
         this.setState({
             nodes: nodes,
@@ -110,14 +121,16 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
 
     handleAddExistingNodeWithLink = (state: DialogNodeSearchToConnectState) => {
         let nodes = this.state.nodes
-        nodes.push(GraphElementFactory.getNode(
-            state.node, new GraphPosition(this.state.tappedPosition.x + 40, this.state.tappedPosition.y + 40))
-        )
+        let node = GraphElementFactory.getNode(
+            state.node, new GraphPosition(this.state.tappedPosition.x + 40, this.state.tappedPosition.y + 40), VISIBILITY.VISIBLE)
+
+        nodes.set(node.data.id, node)
 
         let links = this.state.links
-        links.push(GraphElementFactory.getGraphElementAsLink(
-            GuidService.getRandomGuid(),this.state.nodeToConnect.id, state.node.id, state.label
-        ))
+        let link = GraphElementFactory.getGraphElementAsLink(
+            GuidService.getRandomGuid(), this.state.nodeToConnect.id, state.node.id, state.label, VISIBILITY.VISIBLE)
+
+        links.set(link.data.id, link)
 
         this.setState({
             nodes: nodes,
@@ -129,9 +142,23 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
     handleDeleteNode = (element: any) => {
         let id = element.data().id
 
+        let nodes = this.state.nodes
+        let links = this.state.links
+
+        let node = nodes.get(id)
+        node.visibility = VISIBILITY.HIDDEN
+
+        nodes.set(node.data.id, node)
+
+        links.forEach((link) => {
+            if (link.data.source == id || link.data.target == id) {
+                link.visibility = VISIBILITY.HIDDEN
+            }
+        })
+
         this.setState({
-            nodes: this.state.nodes.filter((node) => node.data.id != id),
-            links: this.state.links.filter((link) => (link.data.source != id && link.data.target != id))
+            nodes: nodes,
+            links: links
         })
     }
 
@@ -200,8 +227,129 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         this.setState({
             dialogSearchNodeToConnectOpen: true,
             tappedPosition: element.position(),
-            nodeToConnect:  element.data()
+            nodeToConnect: element.data()
         })
+    }
+
+    handleLinksCollapse(elements: GraphLinkData[]) {
+        let links = this.state.links
+        let nodes = this.state.nodes
+
+        elements.forEach((element) => {
+            let link = links.get(element.id)
+            link.visibility = VISIBILITY.GROUPED
+            links.set(link.data.id, link)
+
+
+            //console.log(this.getNumberOfTargetLinksForNode(element.target))
+            if (this.getNumberOfLinksForNode(element.target) == 0) {
+                let node = nodes.get(element.target)
+                node.visibility = VISIBILITY.HIDDEN
+            }
+            let node = nodes.get(element.source)
+            node.nodeClasses.push('parent')
+            nodes.set(node.data.id, node)
+        })
+
+        this.setState({
+            links: links,
+            nodes: nodes
+        })
+    }
+
+    getNumberOfTargetLinksForNode(nodeId: string): number {
+        var counter = 0
+        this.state.links.forEach((link) => {
+            if (link.data.target == nodeId && link.visibility.value == VISIBILITY.VISIBLE.value) {
+                counter = counter + 1
+            }
+        })
+        return counter
+    }
+
+    getNumberOfLinksForNode(nodeId: string): number {
+        var counter = 0
+        this.state.links.forEach((link) => {
+            if (link.data.target == nodeId && link.visibility.value == VISIBILITY.VISIBLE.value) {
+                counter = counter + 1
+            }
+            if (link.data.source == nodeId && link.visibility.value == VISIBILITY.VISIBLE.value) {
+                counter = counter + 1
+            }
+        })
+        return counter
+    }
+
+
+
+    handleFilterWindowRequest(element: GraphNodeElement) {
+        this.setState({
+            filterWindowOpen: true,
+            filterWindowNode: element
+        })
+    }
+
+    handleRequestCloseFilterWindow() {
+        this.setState({
+            filterWindowOpen: false,
+            filterWindowNode: null
+        })
+    }
+
+    handleExpandLink(linkId: string) {
+        let links = this.state.links
+        let nodes = this.state.nodes
+
+        let linkToExpand = links.get(linkId)
+        linkToExpand.visibility = VISIBILITY.VISIBLE
+        links.set(linkToExpand.data.id, linkToExpand)
+
+        let targetNode = nodes.get(linkToExpand.data.target)
+        targetNode.visibility = VISIBILITY.VISIBLE
+        nodes.set(targetNode.data.id, targetNode)
+
+        let sourceNode = nodes.get(linkToExpand.data.source)
+        sourceNode.nodeClasses.splice(sourceNode.nodeClasses.indexOf('parent'),1)
+        nodes.set(sourceNode.data.id, sourceNode)
+
+        this.setState({
+            links: links,
+            nodes: nodes
+        })
+    }
+
+    handleExpandAll(nodeId: string) {
+        let links = this.state.links
+        let nodes = this.state.nodes
+
+        links.forEach((link) => {
+            if (link.data.source == nodeId) {
+                link.visibility = VISIBILITY.VISIBLE
+
+                let node = nodes.get(link.data.target)
+                node.visibility = VISIBILITY.VISIBLE
+                nodes.set(node.data.id,node)
+            }
+        })
+
+        let sourceNode = nodes.get(nodeId)
+        sourceNode.nodeClasses.splice(sourceNode.nodeClasses.indexOf('parent'),1)
+        nodes.set(sourceNode.data.id, sourceNode)
+
+        this.setState({
+            links: links,
+            nodes: nodes
+        })
+    }
+
+    getListOfAllCollapsedLinks(nodeId: string): GraphLinkData[] {
+        let list: GraphLinkData[] = []
+        this.state.links.forEach((link) => {
+            if(link.data.source == nodeId && link.visibility == VISIBILITY.GROUPED){
+                list.push(link.data)
+            }
+        })
+        return list
     }
 
     render() {
@@ -246,16 +394,32 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
             ]
         )
 
+        let nodes:GraphNodeElement[] = []
+        this.state.nodes.forEach((node) => {
+            if (node.visibility.value == VISIBILITY.VISIBLE.value) {
+                nodes.push(node)
+            }
+        })
+
+        let links:GraphLinkElement[] = []
+        this.state.links.forEach((link) => {
+            if (link.visibility.value == VISIBILITY.VISIBLE.value){
+                links.push(link)
+            }
+        })
+
         return (
             <div>
                 <Graph
-                    nodes={this.state.nodes}
-                    links={this.state.links}
+                    nodes={nodes}
+                    links={links}
                     coreMenu={coreMenu}
                     nodeMenu={nodeMenu}
                     onNewNode={this.onNodeCreated.bind(this)}
                     onNewLink={this.onLinkCreated.bind(this)}
                     onNodePositionUpdate={this.onNodePositionUpdated.bind(this)}
+                    onEdgesCollapse={this.handleLinksCollapse.bind(this)}
+                    onFilterWindowRequested={this.handleFilterWindowRequest.bind(this)}
                 />
                 {(() => {
                     if (this.state.dialogEditNodeOpen) {
@@ -292,6 +456,29 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
                                 this.state.dialogSearchNodeToConnectOpen, this.handleAddExistingNodeWithLink.bind(this), this.handleCloseDialogSearchNodeToConnect.bind(this)
                             )
                         )
+                    }
+                })()}
+
+                {(() => {
+                    if (this.state.filterWindowOpen) {
+                        let collapsedLinks = this.getListOfAllCollapsedLinks(this.state.filterWindowNode.data.id)
+                        if( collapsedLinks.length > 0) {
+                            return (<div>
+                                <ExpandDialog
+                                    onExpandAll={this.handleExpandAll.bind(this)}
+                                    onExpandNode={this.handleExpandLink.bind(this)}
+                                    timestamp={TimeService.getTimestamp()}
+                                    position={new GraphPosition(
+                                    this.state.filterWindowNode.position.x,
+                                    this.state.filterWindowNode.position.y
+                                )}
+                                    list={collapsedLinks}
+                                    requestClose={this.handleRequestCloseFilterWindow.bind(this)}
+                                />
+                            </div>)
+                        }else{
+                            this.state.filterWindowOpen = false
+                        }
                     }
                 })()}
             </div>

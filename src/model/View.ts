@@ -1,9 +1,11 @@
 import {GraphElement} from "./GraphElement";
+import {GraphNodeElement} from "./GraphNodeData";
+import {GraphLinkElement} from "./GraphLinkData";
 export class View{
-    nodes: GraphElement[]
-    links: GraphElement[]
+    nodes: GraphNodeElement[]
+    links: GraphLinkElement[]
 
-    constructor(nodes:GraphElement[], links:GraphElement[]){
+    constructor(nodes: GraphNodeElement[], links: GraphLinkElement[]){
         this.nodes = nodes
         this.links = links
     }

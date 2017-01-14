@@ -4,7 +4,7 @@ import {GraphNodeData} from "./model/GraphNodeData";
 export class TestNodeInformationProvider implements NodeInformationProvider {
 
     getNodeTitle(ids: number[]): string[] {
-        return undefined;
+        return undefined
     }
 
     getNodeEdgesIds(id: number[]): number[] {
