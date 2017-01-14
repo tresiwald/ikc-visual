@@ -154,7 +154,7 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
         });
 
         // setup overlay
-        this.container = $(this.cy.container())
+        /*this.container = $(this.cy.container())
         this.nodeListWrapper = $('<div id="nodeListWrapper"></div>')
         this.nodeListWrapper.css({
             position: 'absolute',
@@ -167,7 +167,7 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
             visibility:'hidden',
             padding: 10
         });
-        $("body").append(this.nodeListWrapper);
+        $("body").append(this.nodeListWrapper);*/
 
         this.nodeListWrapper = document.createElement('div')
 
@@ -201,7 +201,7 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
             let selectedEdges = that.cy.$("edge:selected");
             that.collapseEdges(selectedEdges)
         })
-        document.body.appendChild(div)
+        document.getElementById('ikc-visual').appendChild(div)
     }
 
     close(free: any, target: any) {
