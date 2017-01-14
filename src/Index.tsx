@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import getMuiTheme = __MaterialUI.Styles.getMuiTheme;
-import GraphScreen from "./components/GraphScreen/GraphScreen";
+import {GraphScreen} from "./components/GraphScreen/GraphScreen";
 import {TestNodeInformationProvider} from "./TestNodeInformationProvider";
 import {TestOperationService} from "./TestOperationService";
 import injectTapEventPlugin = require("react-tap-event-plugin");
