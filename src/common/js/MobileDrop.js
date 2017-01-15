@@ -24,8 +24,8 @@ function registerDropZone(onDrop){
         var container = document.getElementById('ikc-visual')
         var containerBox = container.getBoundingClientRect()
 
-        var dropX = getOffset(div).left + radius
-        var dropY = getOffset(div).top + radius
+        var dropX = e.screenX
+        var dropY = e.screenY
 
         if(containerBox.left < dropX && (containerBox.left + containerBox.width) > dropX && containerBox.top < dropY && (containerBox.top + containerBox.height) > dropY){
             div.style.visibility = 'hidden'
