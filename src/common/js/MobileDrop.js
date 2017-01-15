@@ -21,13 +21,21 @@ function registerDragZone(id){
 
 function registerDropZone(onDrop){
     function moveEnd(e) {
-        div.style.visibility = 'hidden'
-        onDrop({
-            clientX: getOffset(div).left + radius ,
-            clientY: getOffset(div).top + radius,
-            id: nodeId
-        })
-        nodeId = null
+        var container = document.getElementById('ikc-visual')
+        var containerBox = container.getBoundingClientRect()
+
+        var dropX = getOffset(div).top + radius
+        var dropY = getOffset(div).left + radius
+
+        if(containerBox.left < dropX && (containerBox.left + containerBox.width) > dropX && containerBox.top < dropY && (containerBox.top + containerBox.height) > dropY){
+            div.style.visibility = 'hidden'
+            onDrop({
+                clientX: getOffset(div).left + radius ,
+                clientY: getOffset(div).top + radius,
+                id: nodeId
+            })
+            nodeId = null
+        }
     }
     document.body.appendChild(div)
 
