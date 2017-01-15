@@ -30,7 +30,8 @@ function registerDropZone(onDrop){
         var element = document.elementFromPoint(e.clientX, e.clientY)
         console.log(element)
 
-        if(isDescendant(container, element)){
+        var dropOnContainer = containerBox.left < dropX && containerBox.right > dropX && containerBox.top < dropY && containerBox.bottom > dropY
+        if(dropOnContainer){
             div.style.visibility = 'hidden'
             onDrop({
                 clientX: getOffset(div).left + radius ,
