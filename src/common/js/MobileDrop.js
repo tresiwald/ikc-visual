@@ -1,9 +1,15 @@
 $(document).mousemove(function(e){
-    $("#tmpNode").css({left:e.pageX - 15, top:e.pageY - 15});
+    if(nodeId != null) {
+        $("#tmpNode").css({left: e.pageX - 15, top: e.pageY - 15});
+        document.cursor = "pointer"
+    }
 });
 
 document.ondrag = function (e) {
-    $("#tmpNode").css({left:e.pageX - 15, top:e.pageY - 15});
+    if(nodeId != null) {
+        $("#tmpNode").css({left: e.pageX - 15, top: e.pageY - 15});
+        document.cursor = "pointer"
+    }
 }
 
 var radius = 15
