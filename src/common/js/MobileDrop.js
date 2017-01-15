@@ -1,14 +1,12 @@
 $(document).mousemove(function(e){
     if(nodeId != null) {
-        $("#tmpNode").css({left: e.pageX - 15, top: e.pageY - 15});
-        document.cursor = "pointer"
+        $("#tmpNode").css({left: e.pageX - 15, top: e.pageY - 15,  cursor: 'pointer'});
     }
 });
 
 document.ondrag = function (e) {
     if(nodeId != null) {
-        $("#tmpNode").css({left: e.pageX - 15, top: e.pageY - 15});
-        document.cursor = "pointer"
+        $("#tmpNode").css({left: e.pageX - 15, top: e.pageY - 15,  cursor: 'pointer'});
     }
 }
 
