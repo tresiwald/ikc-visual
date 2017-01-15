@@ -27,7 +27,10 @@ function registerDropZone(onDrop){
         var dropX = e.screenX
         var dropY = e.screenY
 
-        if(containerBox.left < dropX && (containerBox.left + containerBox.width) > dropX && containerBox.top < dropY && (containerBox.top + containerBox.height) > dropY){
+        var element = document.elementFromPoint(e.clientX, e.clientY)
+        console.log(element)
+
+        if(isDescendant(container, element)){
             div.style.visibility = 'hidden'
             onDrop({
                 clientX: getOffset(div).left + radius ,
@@ -61,4 +64,17 @@ function getOffset(el) {
         left: el.left + window.scrollX,
         top: el.top + window.scrollY
     }
+}
+
+
+
+function isDescendant(parent, child) {
+    var node = child.parentNode;
+    while (node != null) {
+        if (node == parent) {
+            return true;
+        }
+        node = node.parentNode;
+    }
+    return false;
 }
