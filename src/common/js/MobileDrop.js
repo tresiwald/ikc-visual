@@ -38,7 +38,7 @@ function registerDropZone(onDrop){
                 clientY: getOffset(div).top + radius,
                 id: nodeId
             })
-            nodeId = nul
+            nodeId = null
         }
     }
     document.body.appendChild(div)
