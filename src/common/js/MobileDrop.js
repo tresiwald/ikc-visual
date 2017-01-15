@@ -24,8 +24,8 @@ function registerDropZone(onDrop){
         var container = document.getElementById('ikc-visual')
         var containerBox = container.getBoundingClientRect()
 
-        var dropX = e.screenX
-        var dropY = e.screenY
+        var dropX = e.clientX
+        var dropY = e.clientY
 
         var element = document.elementFromPoint(e.clientX, e.clientY)
         console.log(element)
@@ -38,7 +38,7 @@ function registerDropZone(onDrop){
                 clientY: getOffset(div).top + radius,
                 id: nodeId
             })
-            nodeId = null
+            nodeId = nul
         }
     }
     document.body.appendChild(div)
