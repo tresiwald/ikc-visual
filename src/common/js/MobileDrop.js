@@ -1,6 +1,9 @@
 $(document).mousemove(function(e){
     $("#tmpNode").css({left:e.pageX - 15, top:e.pageY - 15});
 });
+$(document).ondrag(function(e){
+    $("#tmpNode").css({left:e.pageX - 15, top:e.pageY - 15});
+});
 
 var radius = 15
 var nodeId = null
