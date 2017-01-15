@@ -24,7 +24,7 @@ export class DialogNodeDetailToConnect extends React.Component<DialogNodeDetailT
             this.state.node = this.props.node;
 
             if(this.props.asNewDialog){
-                this.state.node = new GraphNodeData(GuidService.getRandomGuid(),"")
+                this.state.node = new GraphNodeData(GuidService.getRandomGuid())
             }
         }
     }

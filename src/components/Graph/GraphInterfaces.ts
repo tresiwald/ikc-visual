@@ -7,13 +7,16 @@ import {GraphLinkElement} from "../../model/GraphLinkData";
 export interface GraphProps {
     nodes: GraphNodeElement[]
     links: GraphLinkElement[]
-    nodeMenu: ContextMenu
-    coreMenu: ContextMenu
+    nodeMenu?: ContextMenu
+    coreMenu?: ContextMenu
     onNewNode: Function
     onNewLink: Function
     onNodePositionUpdate: Function
     onEdgesCollapse?: Function
     onFilterWindowRequested?: Function
+    onNodeDetailRequest?: Function
+    onCoreDesktopMenuRequested?:Function
+    onNodeDesktopMenuRequested?:Function
 }
 
 export interface GraphState {

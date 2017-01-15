@@ -13,7 +13,9 @@ export interface  GraphScreenProps {
     nodeInformationProvider: NodeInformationProvider;
     operationService: OperationService;
     timestamp: string;
-    dialogFactory: DialogFactory
+    dialogFactory: DialogFactory;
+    onNodeDetailRequest: Function;
+    nodeTypesCreateFunctions?: Map<string, Function>
 }
 
 export interface  GraphScreenStats {
@@ -25,8 +27,7 @@ export interface  GraphScreenStats {
     dialogSearchNodeOpen?: boolean;
     dialogNewNodeToConnectOpen?: boolean;
     dialogSearchNodeToConnectOpen?: boolean;
-    nodeToEdit?: GraphNodeData;
-    nodeToConnect?: GraphNodeData;
+    tappedNode?: GraphNodeData;
     tappedPosition?: GraphPosition;
     filterWindowOpen?: boolean;
     filterWindowNode?:GraphNodeElement;

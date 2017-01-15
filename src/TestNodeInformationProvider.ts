@@ -3,25 +3,22 @@ import {GraphNodeData} from "./model/GraphNodeData";
 
 export class TestNodeInformationProvider implements NodeInformationProvider {
 
-    getNodeTitle(ids: number[]): string[] {
+    getNodeTitle(id: string): string {
+        let random = Math.round(Math.random()*100)
+        return "Node-" + random
+    }
+
+    getLinkLabel(id: string): string {
+        let random = Math.random()
+        return "Link-" + random
+    }
+
+    getNodeTitles(ids: string[]): string[] {
         return undefined
     }
 
-    getNodeEdgesIds(id: number[]): number[] {
+
+    getNodeEdgesIds(id: string[]): string[] {
         return undefined;
-    }
-
-
-    getChildsOfNode(id: string): GraphNodeData[] {
-        let returnArr = []
-        let rand = Math.random()*8
-        for(var i = 0; i<rand; i++ ){
-            returnArr.push(
-                new GraphNodeData(
-                    i.toString(), i.toString()
-                )
-            )
-        }
-        return returnArr
     }
 }

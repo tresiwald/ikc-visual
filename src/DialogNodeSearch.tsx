@@ -18,7 +18,7 @@ export class DialogNodeSearch extends React.Component<DialogNodeSearchProps, Dia
     initState = () => {
         if (this.state.timestamp != this.props.timestamp) {
             this.state.timestamp = this.props.timestamp;
-            this.state.node = new GraphNodeData(GuidService.getRandomGuid(), "")
+            this.state.node = new GraphNodeData(GuidService.getRandomGuid())
         }
     }
 

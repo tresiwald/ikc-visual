@@ -1,32 +1,26 @@
 import * as React from "react";
-import * as ReactDOM from "react-dom";
 import {GraphProps, GraphState} from "./GraphInterfaces";
 import {GuidService} from "../../common/GuidService";
 import {GraphElementFactory} from "../../model/GraphElementFactory";
 import {GraphPosition} from "../../model/GraphPosition";
-import {MuiThemeProvider} from "material-ui/styles";
-import ExpandDialog from "../ExpandDialog/ExpandDialog";
 import {GraphLinkData} from "../../model/GraphLinkData";
-import {TimeService} from "../../common/TimeService";
 import {VISIBILITY} from "../../model/VISIBILITY";
 import getMuiTheme = __MaterialUI.Styles.getMuiTheme;
 
 let cytoscape = require('cytoscape');
 let cytoscapeCtxmenu = require('cytoscape-cxtmenu');
+var contextMenus = require('cytoscape-context-menus');
 
 declare function $(a: any): any
 
 // register dependencies
 cytoscapeCtxmenu(cytoscape);
+contextMenus( cytoscape, $ );
 
 declare function registerDropZone(onDrop: Function): any
 
 export default class Graph extends React.Component<GraphProps, GraphState> {
     private cy: any
-    private nodeIdentifier = 'collapsedNodes';
-    private edgeIdentifier = 'collapsedEdges';
-    private container: any
-    private nodeListWrapper: any
 
     constructor(props: any) {
         super(props);
@@ -45,10 +39,6 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
             container: document.getElementById('ikc-visual'),
 
             pan: this.state.pan,
-
-            boxSelectionEnabled: true,
-            autounselectify: false,
-            selectionType: 'additive',
 
             layout: {
                 name: 'preset',
@@ -121,6 +111,22 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
             that.state.pan = e.cy.pan()
         })
 
+        if(!(this.props.coreMenu && this.props.nodeMenu)){
+            this.cy.nodes().on('mousedown',function (e:any){
+                if(!e.cyTarget.hasClass('parent')){
+                    that.props.onNodeDetailRequest(e.cyTarget.data())
+                }
+            })
+            this.cy.nodes().on('cxttap',function (e:any){
+                that.props.onNodeDesktopMenuRequested(e.cyTarget)
+            })
+            this.cy.on('cxttap',function (e:any){
+                if(!e.cyTarget.id) {
+                    that.props.onCoreDesktopMenuRequested(e.cyPosition)
+                }
+            })
+        }
+
         // setup drag and drop to connect to nodes
         this.cy.nodes().on('grab', function (e: any) {
 
@@ -137,7 +143,7 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
                 if (targetNode.id()) {
                     console.log("add link between" + node.id() + " and " + targetNode.id());
                     that.props.onNewLink(
-                        GraphElementFactory.getGraphElementAsLink(GuidService.getRandomGuid(), node.id(), targetNode.id(), "",VISIBILITY.VISIBLE),
+                        GraphElementFactory.getGraphElementAsLink(GuidService.getRandomGuid(), node.id(), targetNode.id(),VISIBILITY.VISIBLE),
                         oldPos
                     )
                     that.state.oldPosition.delete(node.id())
@@ -153,35 +159,17 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
 
         });
 
-        // setup overlay
-        /*this.container = $(this.cy.container())
-        this.nodeListWrapper = $('<div id="nodeListWrapper"></div>')
-        this.nodeListWrapper.css({
-            position: 'absolute',
-            zIndex: 15002,
-            width: 300,
-            height: 400,
-            display: 'block',
-            overflow: 'hidden',
-            'pointer-events': 'none',
-            visibility:'hidden',
-            padding: 10
-        });
-        $("body").append(this.nodeListWrapper);*/
-
-        this.nodeListWrapper = document.createElement('div')
-
         this.cy.on('tap', 'node.parent', function (evt: any) {
-
             let node = evt.cyTarget;
-
             that.props.onFilterWindowRequested(GraphElementFactory.getNode(node.data(),node.position(), VISIBILITY.VISIBLE))
 
         });
 
         // add contextmenu
-        this.cy.cxtmenu(this.props.coreMenu);
-        this.cy.cxtmenu(this.props.nodeMenu);
+        if(this.props.nodeMenu && this.props.coreMenu) {
+            this.cy.cxtmenu(this.props.coreMenu);
+            this.cy.cxtmenu(this.props.nodeMenu);
+        }
 
     }
 
@@ -244,12 +232,11 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
                 this.props.onNewNode(
                     GraphElementFactory.getGraphElementAsNode(
                         event.id,
-                        "test",
                         that.calcNodePosition(100, Math.random() * 360, node.position()),VISIBILITY.VISIBLE
                     )
                 )
                 this.props.onNewLink(
-                    GraphElementFactory.getGraphElementAsLink(GuidService.getRandomGuid(), node.id(), event.id, "",VISIBILITY.VISIBLE),
+                    GraphElementFactory.getGraphElementAsLink(GuidService.getRandomGuid(), node.id(), event.id,VISIBILITY.VISIBLE),
                     node.position()
                 )
             }
@@ -258,7 +245,6 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
         this.props.onNewNode(
             GraphElementFactory.getGraphElementAsNode(
                 event.id,
-                "test",
                 new GraphPosition(
                     event.clientX - canvas.getBoundingClientRect().left - this.state.pan.x,
                     event.clientY - canvas.getBoundingClientRect().top - this.state.pan.y

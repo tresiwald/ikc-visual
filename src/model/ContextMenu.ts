@@ -3,7 +3,7 @@ export class ContextMenu{
     selector: string
     commands:ContextMenuCommand[]
     itemTextShadowColor:string = 'none'
-    atMouse: boolean = true
+    //atMouse: boolean = true
 
     constructor(selector:string, commands:ContextMenuCommand[]){
         this.selector = selector

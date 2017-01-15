@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import getMuiTheme = __MaterialUI.Styles.getMuiTheme;
-import {GraphScreen} from "./components/GraphScreen/GraphScreen";
+import GraphScreen from "./components/GraphScreen/GraphScreen";
 import {TestNodeInformationProvider} from "./TestNodeInformationProvider";
 import {TestOperationService} from "./TestOperationService";
 import injectTapEventPlugin = require("react-tap-event-plugin");
@@ -31,6 +31,9 @@ let testNodeInformationProvider = new TestNodeInformationProvider();
 let testOperationService = new TestOperationService();
 let testDialogFactory = new TestDialogFactory();
 
+let tmp = new Map<string, Function>()
+tmp.set('Dropbox', () => {console.log('createDropbox')})
+tmp.set('Evernote', () => {console.log('createEvernote')})
 
 function init() {
 
@@ -41,13 +44,20 @@ injectTapEventPlugin();
 
 
 ReactDOM.render((
+
     <div id="wrapper">
         <MuiThemeProvider>
             <div>
                 <GraphScreen nodeInformationProvider={testNodeInformationProvider}
                              onViewDelete={()=>{console.log("implement a function to delete the view.")}}
                              onViewSave={()=>{console.log("implement a function to save the view.")}}
-                             operationService={testOperationService} viewToLoad={viewToLoad} timestamp={TimeService.getTimestamp()} dialogFactory={testDialogFactory} />
+                              operationService={testOperationService}
+                             viewToLoad={viewToLoad}
+                             timestamp={TimeService.getTimestamp()}
+                             dialogFactory={testDialogFactory}
+                             onNodeDetailRequest={(id:string) => console.log(id)}
+                             nodeTypesCreateFunctions={tmp}
+                />
                 <TestDrag/>
             </div>
         </MuiThemeProvider>
