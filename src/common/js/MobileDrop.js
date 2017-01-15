@@ -28,8 +28,9 @@ function registerDragZone(id){
 }
 
 function registerDropZone(onDrop){
+    var container = document.getElementById('ikc-visual')
+
     function moveEnd(e) {
-        var container = document.getElementById('ikc-visual')
         var containerBox = container.getBoundingClientRect()
 
         var dropX = e.clientX
@@ -51,12 +52,12 @@ function registerDropZone(onDrop){
     }
     document.body.appendChild(div)
 
-
     document.addEventListener("mouseup", function(e){
         if(nodeId != null){
             moveEnd(e)
         }
     });
+
 
     document.addEventListener("touchmove",  function(e){
         ele = document.elementFromPoint(e.targetTouches[0].clientX,e.targetTouches[0].clientY)

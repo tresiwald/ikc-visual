@@ -16,7 +16,7 @@ export default class TestDrag extends React.Component<TestDragProps, TestDragSta
 
     render() {
         return (
-                <div draggable={true} onDragStart={this.onDrag.bind(this)} className={"mobileDraggable id-" + (Math.round(Math.random() * 100))} >New Node</div>
+                <div draggable={true} onMouseDown={this.onDrag.bind(this)} className={"mobileDraggable id-" + (Math.round(Math.random() * 100))} >New Node</div>
         )
     }
 }
