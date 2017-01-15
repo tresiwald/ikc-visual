@@ -437,8 +437,8 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
 
         let element = document.getElementById('coreContextDesktopMenu');
         let visualElement = document.getElementById('ikc-visual');
-        element.style.marginLeft = (position.x + visualElement.getBoundingClientRect().left) + "px";
-        element.style.marginTop = (position.y + visualElement.getBoundingClientRect().top ) + "px";
+        element.style.marginLeft = (position.x ) + "px";
+        element.style.marginTop = (position.y) + "px";
         (element.childNodes[0] as any).style.width = 'auto'
     }
 
