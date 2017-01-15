@@ -9,13 +9,11 @@ import getMuiTheme = __MaterialUI.Styles.getMuiTheme;
 
 let cytoscape = require('cytoscape');
 let cytoscapeCtxmenu = require('cytoscape-cxtmenu');
-var contextMenus = require('cytoscape-context-menus');
 
 declare function $(a: any): any
 
 // register dependencies
 cytoscapeCtxmenu(cytoscape);
-contextMenus( cytoscape, $ );
 
 declare function registerDropZone(onDrop: Function): any
 
