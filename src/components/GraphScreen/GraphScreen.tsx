@@ -175,15 +175,22 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
 
         let links = this.state.links
         let link = GraphElementFactory.getGraphElementAsLink(
-            GuidService.getRandomGuid(), this.state.tappedNode.id, state.link.target, VISIBILITY.VISIBLE)
+            TimeService.getTimestamp(), this.state.tappedNode.id, state.link.target, VISIBILITY.VISIBLE)
 
         links.set(link.data.id, link)
 
-        this.setState({
+        this.state.nodes = nodes
+        this.state.links = links
+        this.state.dialogSearchNodeToConnectOpen = false
+
+        this.props.operationService.saveView(ViewFactory.viewFromMaps(this.state.nodes,this.state.links, this.props.viewToLoad.title))
+        this.props.operationService.createLink(state.link.id, state.link.source, state.link.target, state.label)
+
+        /*this.setState({
             nodes: nodes,
             links: links,
             dialogSearchNodeToConnectOpen: false
-        })
+        })*/
     }
 
     handleDeleteNodeMobile = (element: any) => {

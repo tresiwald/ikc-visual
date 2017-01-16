@@ -17,4 +17,16 @@ export module ViewFactory {
         view.id = '0'
         return view
     }
+    export function viewFromMaps(nodes: Map<string,GraphNodeElement>, links: Map<string,GraphLinkElement>, title:string): View{
+        let resultingNodes: GraphNodeElement[] = []
+        nodes.forEach((node) => {
+            resultingNodes.push(node)
+        })
+
+        let resultingLinks: GraphLinkElement[] = []
+        links.forEach((link) => {
+            resultingLinks.push(link)
+        })
+        return new View(title,resultingNodes, resultingLinks)
+    }
 }
