@@ -14,6 +14,7 @@ export class View{
         this.id = TimeService.getTimestamp()
         this.changedAt = TimeService.getTimestamp()
         this.createdAt = TimeService.getTimestamp()
+        this.title = title
         this.nodes = nodes
         this.links = links
     }
