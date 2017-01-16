@@ -169,13 +169,13 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
     handleAddExistingNodeWithLink = (state: DialogNodeSearchToConnectState) => {
         let nodes = this.state.nodes
         let node = GraphElementFactory.getNode(
-            state.node, new GraphPosition(this.state.tappedPosition.x + 40, this.state.tappedPosition.y + 40), VISIBILITY.VISIBLE)
+            nodes.get(state.link.target).data, new GraphPosition(this.state.tappedPosition.x + 40, this.state.tappedPosition.y + 40), VISIBILITY.VISIBLE)
 
         nodes.set(node.data.id, node)
 
         let links = this.state.links
         let link = GraphElementFactory.getGraphElementAsLink(
-            GuidService.getRandomGuid(), this.state.tappedNode.id, state.node.id, VISIBILITY.VISIBLE)
+            GuidService.getRandomGuid(), this.state.tappedNode.id, state.link.target, VISIBILITY.VISIBLE)
 
         links.set(link.data.id, link)
 
