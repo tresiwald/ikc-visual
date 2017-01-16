@@ -1,15 +1,16 @@
-import {GraphNodeData} from "../model/GraphNodeData";
+import {GraphLinkData} from "../model/GraphLinkData";
 
 export interface DialogNodeSearchToConnectProps {
     open: boolean,
     timestamp: string
     onSave: Function
     onRequestClose: Function
+    title:string
 }
 
 export interface DialogNodeSearchToConnectState {
     nodeName?: string
     timestamp?: string
-    node?: GraphNodeData
+    link?: GraphLinkData
     label?: string
 }
