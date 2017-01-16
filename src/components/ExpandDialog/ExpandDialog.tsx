@@ -86,7 +86,7 @@ export default class ExpandDialog extends React.Component<ExpandDialogProps,Expa
                 tmpResults = this.props.list
             } else {
                 this.props.list.forEach((item) => {
-                    if (item.target.indexOf(this.state.searchText) > 0) {
+                    if (item.target.indexOf(this.state.searchText) >= 0) {
                         tmpResults.push(item)
                     }
                 })
