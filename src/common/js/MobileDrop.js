@@ -61,7 +61,7 @@ function registerDropZone(onDrop){
         document.body.style["-moz-user-select"] = ""
         document.body.style["-ms-user-select"] = ""
         document.body.style["user-select"] = ""
-    }
+
         div.style.visibility = 'hidden'
         nodeId = null
     }
