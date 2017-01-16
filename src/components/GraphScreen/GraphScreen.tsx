@@ -84,8 +84,19 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         let nodes = this.state.nodes
         nodes.set(newNode.data.id, newNode)
 
+        let links = this.state.links
+        links.forEach((link) => {
+            if(link.data.source == newNode.data.id && nodes.get(link.data.target).visibility.value == VISIBILITY.VISIBLE.value){
+                link.visibility = VISIBILITY.VISIBLE
+            }
+            if(link.data.target == newNode.data.id && nodes.get(link.data.source).visibility.value == VISIBILITY.VISIBLE.value){
+                link.visibility = VISIBILITY.VISIBLE
+            }
+        })
+
         this.setState({
-            nodes: nodes
+            nodes: nodes,
+            links: links
         })
     }
 
@@ -584,7 +595,6 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
                 links.push(link)
             }
         })
-
 
 
         return (
