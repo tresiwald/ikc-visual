@@ -183,7 +183,10 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         this.state.links = links
         this.state.dialogSearchNodeToConnectOpen = false
 
-        this.props.operationService.saveView(ViewFactory.viewFromMaps(this.state.nodes,this.state.links, this.props.viewToLoad.title))
+        let view = ViewFactory.viewFromMaps(this.state.nodes,this.state.links, this.props.viewToLoad.title)
+        view.id = this.props.viewToLoad.id
+
+        this.props.operationService.saveView(view)
         this.props.operationService.createLink(state.link.id, this.state.tappedNode.id, state.link.target, state.label)
 
         /*this.setState({
