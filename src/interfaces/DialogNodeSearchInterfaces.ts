@@ -5,6 +5,7 @@ export interface DialogNodeSearchProps {
     timestamp: string
     onSave: Function
     onRequestClose: Function
+    title:string
 }
 
 export interface DialogNodeSearchState {
