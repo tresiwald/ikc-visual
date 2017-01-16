@@ -22,8 +22,9 @@ div.style.opacity = '0.5'
 div.style.position = 'absolute'
 div.style.visibility = 'hidden'
 
-function registerDragZone(id){
+function registerDragZone(id, event){
     nodeId = id
+    $("#tmpNode").css({left: event.pageX - 15, top: event.pageY - 15,  cursor: 'pointer'});
     div.style.visibility = 'visible'
 }
 
