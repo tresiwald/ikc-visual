@@ -26,6 +26,12 @@ function registerDragZone(id, event){
     nodeId = id
     $("#tmpNode").css({left: event.pageX - 15, top: event.pageY - 15,  cursor: 'pointer'});
     div.style.visibility = 'visible'
+    document.body.style["-webkit-touch-callout"] = "none"
+    document.body.style["-webkit-user-select"] = "none"
+    document.body.style["-khtml-user-select"] = "none"
+    document.body.style["-moz-user-select"] = "none"
+    document.body.style["-ms-user-select"] = "none"
+    document.body.style["user-select"] = "none"
 }
 
 function registerDropZone(onDrop){
@@ -48,12 +54,25 @@ function registerDropZone(onDrop){
                 id: nodeId
             })
         }
+
+        document.body.style["-webkit-touch-callout"] = ""
+        document.body.style["-webkit-user-select"] = ""
+        document.body.style["-khtml-user-select"] = ""
+        document.body.style["-moz-user-select"] = ""
+        document.body.style["-ms-user-select"] = ""
+        document.body.style["user-select"] = ""
+    }
         div.style.visibility = 'hidden'
         nodeId = null
     }
     document.body.appendChild(div)
 
     document.addEventListener("mouseup", function(e){
+        if(nodeId != null){
+            moveEnd(e)
+        }
+    });
+    document.addEventListener("drop", function(e){
         if(nodeId != null){
             moveEnd(e)
         }
@@ -75,17 +94,4 @@ function getOffset(el) {
         left: el.left + window.scrollX,
         top: el.top + window.scrollY
     }
-}
-
-
-
-function isDescendant(parent, child) {
-    var node = child.parentNode;
-    while (node != null) {
-        if (node == parent) {
-            return true;
-        }
-        node = node.parentNode;
-    }
-    return false;
 }
