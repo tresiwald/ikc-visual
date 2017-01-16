@@ -8,7 +8,7 @@ import {GraphPosition} from "../../model/GraphPosition";
 
 export interface  GraphScreenProps {
     viewToLoad: View;
-    onViewSave: Function;
+    onViewUpdate: Function;
     onViewDelete: Function;
     nodeInformationProvider: NodeInformationProvider;
     operationService: OperationService;

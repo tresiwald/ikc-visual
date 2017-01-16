@@ -15,6 +15,7 @@ import {VISIBILITY} from "../../model/VISIBILITY";
 import ExpandDialog from "../ExpandDialog/ExpandDialog";
 import {TimeService} from "../../common/TimeService";
 import {Menu, MenuItem, Paper} from "material-ui";
+import {ViewFactory} from "../../model/ViewFactory";
 
 export default class GraphScreen extends React.Component<GraphScreenProps, GraphScreenStats> {
     constructor(props: any) {
@@ -50,12 +51,28 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
             let nodes = new Map<string, GraphNodeElement>()
             let links = new Map<string, GraphLinkElement>()
 
-            this.props.viewToLoad.nodes.forEach((node) => nodes.set(node.data.id, node))
+            this.props.viewToLoad.nodes.forEach((node) => {nodes.set(node.data.id, node)})
             this.props.viewToLoad.links.forEach((link) => links.set(link.data.id, link))
 
             this.state.nodes = nodes
             this.state.links = links
         }
+    }
+
+    updateView = () => {
+        let nodes: GraphNodeElement[] = []
+        this.state.nodes.forEach((node) => {
+            nodes.push(node)
+        })
+
+        let links: GraphLinkElement[] = []
+        this.state.links.forEach((link) => {
+            links.push(link)
+        })
+
+        let view = ViewFactory.viewFromNodesAndLinks(nodes, links)
+
+        this.props.onViewUpdate(view)
     }
 
     onLinkCreated = (newLink: GraphLinkElement, oldSourcePosition: GraphPosition) => {
@@ -66,6 +83,7 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
     onNodeCreated = (newNode: GraphNodeElement) => {
         let nodes = this.state.nodes
         nodes.set(newNode.data.id, newNode)
+
         this.setState({
             nodes: nodes
         })
