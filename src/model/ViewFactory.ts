@@ -12,4 +12,9 @@ export module ViewFactory {
     export function titledViewFromNodesAndLinksWith(title:string,nodes: GraphNodeElement[], links: GraphLinkElement[]): View{
         return new View(title,nodes, links)
     }
+    export function defaultViewFromNodesAndLinksWith(title:string,nodes: GraphNodeElement[], links: GraphLinkElement[]): View{
+        let view = new View(title,nodes, links)
+        view.id = '0'
+        return view
+    }
 }
