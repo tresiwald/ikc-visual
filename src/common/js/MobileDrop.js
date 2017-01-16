@@ -41,8 +41,6 @@ function registerDropZone(onDrop){
         console.log(element)
 
         var dropOnContainer = containerBox.left < dropX && containerBox.right > dropX && containerBox.top < dropY && containerBox.bottom > dropY
-        div.style.visibility = 'hidden'
-        nodeId = null
         if(dropOnContainer){
             onDrop({
                 clientX: getOffset(div).left + radius ,
@@ -50,6 +48,8 @@ function registerDropZone(onDrop){
                 id: nodeId
             })
         }
+        div.style.visibility = 'hidden'
+        nodeId = null
     }
     document.body.appendChild(div)
 
