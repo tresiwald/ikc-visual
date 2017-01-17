@@ -5,6 +5,7 @@ import {GraphNodeElement, GraphNodeData} from "../../model/GraphNodeData";
 import {GraphLinkElement} from "../../model/GraphLinkData";
 import {DialogFactory} from "../../interfaces/DialogFactory";
 import {GraphPosition} from "../../model/GraphPosition";
+import {GraphNodeType} from "../../model/GraphNodeType";
 
 export interface  GraphScreenProps {
     viewToLoad: View;
@@ -15,7 +16,7 @@ export interface  GraphScreenProps {
     timestamp: string;
     dialogFactory: DialogFactory;
     onNodeDetailRequest: Function;
-    nodeTypesCreateFunctions?: Map<string, string>
+    nodeTypes?: GraphNodeType[]
 }
 
 export interface  GraphScreenStats {
@@ -31,4 +32,5 @@ export interface  GraphScreenStats {
     tappedPosition?: GraphPosition;
     filterWindowOpen?: boolean;
     filterWindowNode?:GraphNodeElement;
+    newNodeType?: GraphNodeType
 }

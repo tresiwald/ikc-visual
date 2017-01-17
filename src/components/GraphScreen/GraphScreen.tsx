@@ -7,15 +7,16 @@ import {GraphElementFactory} from "../../model/GraphElementFactory";
 import {GraphPosition} from "../../model/GraphPosition";
 import {GraphNodeElement, GraphNodeData} from "../../model/GraphNodeData";
 import {GraphLinkElement, GraphLinkData} from "../../model/GraphLinkData";
-import {DialogNodeDetailProps} from "../../interfaces/NewDialogNodeDetailInterfaces";
+import {NewDialogNodeDetailState} from "../../interfaces/NewDialogNodeDetailInterfaces";
 import {GuidService} from "../../common/GuidService";
-import {DialogNodeDetailToConnectState} from "../../interfaces/NewDialogNodeDetailInterfacesToConnect";
+import {NewDialogNodeDetailToConnectState} from "../../interfaces/NewDialogNodeDetailInterfacesToConnect";
 import {DialogNodeSearchToConnectState} from "../../interfaces/DialogNodeSearchToConnectInterfaces";
 import {VISIBILITY} from "../../model/VISIBILITY";
 import ExpandDialog from "../ExpandDialog/ExpandDialog";
 import {TimeService} from "../../common/TimeService";
 import {Menu, MenuItem, Paper} from "material-ui";
 import {ViewFactory} from "../../model/ViewFactory";
+import {GraphNodeType} from "../../model/GraphNodeType";
 
 export default class GraphScreen extends React.Component<GraphScreenProps, GraphScreenStats> {
     constructor(props: any) {
@@ -124,7 +125,7 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         })
     }
 
-    handleSaveNode = (state: DialogNodeDetailProps) => {
+    handleSaveNode = (state: NewDialogNodeDetailState) => {
         let nodes = this.state.nodes
 
         nodes.forEach((node) => {
@@ -136,20 +137,23 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         this.handleCloseDialogEditNode()
     }
 
-    handleAddNewNode = (state: DialogNodeDetailProps) => {
+    handleAddNewNode = (state: NewDialogNodeDetailState) => {
         let nodes = this.state.nodes
         let node = GraphElementFactory.getNode(state.node, this.state.tappedPosition, VISIBILITY.VISIBLE)
         nodes.set(node.data.id, node)
 
-        this.setState({
-            nodes: nodes,
-            dialogNewNodeOpen: false
-        },() => {
-            this.saveView()
-        })
+
+        this.state.nodes = nodes
+        this.state.dialogNewNodeOpen = false
+
+        this.saveView()
+
+        this.props.operationService.createNodeFromDialogState(state)
+
+        this.forceUpdate()
     }
 
-    handleAddExistingNode = (state: DialogNodeDetailProps) => {
+    handleAddExistingNode = (state: NewDialogNodeDetailState) => {
         let nodes = this.state.nodes
         let node = GraphElementFactory.getNode(state.node, this.state.tappedPosition, VISIBILITY.VISIBLE)
         nodes.set(node.data.id, node)
@@ -162,7 +166,7 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         })
     }
 
-    handleAddNewNodeWithLink = (state: DialogNodeDetailToConnectState) => {
+    handleAddNewNodeWithLink = (state: NewDialogNodeDetailToConnectState) => {
         let nodes = this.state.nodes
         let node = GraphElementFactory.getNode(
             state.node, new GraphPosition(this.state.tappedPosition.x + 10, this.state.tappedPosition.y + 10), VISIBILITY.VISIBLE)
@@ -175,13 +179,16 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
 
         links.set(link.data.id, link)
 
-        this.setState({
-            nodes: nodes,
-            links: links,
-            dialogNewNodeToConnectOpen: false
-        },() => {
-            this.saveView()
-        })
+
+        this.state.nodes = nodes
+        this.state.links = links
+        this.state.dialogNewNodeToConnectOpen = false
+
+        this.saveView()
+
+        this.props.operationService.createNodeWithLinkFromDialogState(state)
+
+        this.forceUpdate()
     }
 
     handleAddExistingNodeWithLink = (state: DialogNodeSearchToConnectState) => {
@@ -568,6 +575,22 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         document.getElementById('nodeContextDesktopMenu').style.display = 'none';
     }
 
+    handleNewNodeRequested = (type:GraphNodeType) =>{
+        this.hideCoreMenu()
+        this.setState({
+            newNodeType: type,
+            dialogNewNodeOpen: true
+        })
+    }
+
+    handleNewNodeRequestedToConnect = (type:GraphNodeType) =>{
+        this.hideNodeMenu()
+        this.setState({
+            newNodeType: type,
+            dialogNewNodeToConnectOpen: true
+        })
+    }
+
     render() {
         this.initState()
         let that = this
@@ -664,11 +687,8 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
                                         }}/>
                                         {(()=> {
                                             let returnList:any[] = []
-                                            this.props.nodeTypesCreateFunctions.forEach((fn, nodeType) => {
-                                                returnList.push(<MenuItem  primaryText={"Add new " + nodeType + " Node"} onTouchTap={() => {
-                                                    this.hideCoreMenu()
-                                                    fn()
-                                                }}/>)
+                                            this.props.nodeTypes.forEach((nodeType) => {
+                                                returnList.push(<MenuItem   primaryText={"Add new " + nodeType.name + " Node"} onTouchTap={() => this.handleNewNodeRequestedToConnect(nodeType)}/>)
                                             })
                                             return returnList
                                         })()}
@@ -695,11 +715,8 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
                                         }}/>
                                         {(()=> {
                                             let returnList:any[] = []
-                                            this.props.nodeTypesCreateFunctions.forEach((fn, nodeType) => {
-                                                returnList.push(<MenuItem  primaryText={"Link to new " + nodeType + " Node"} onTouchTap={() => {
-                                                    this.hideNodeMenu()
-                                                    fn()
-                                                }}/>)
+                                            this.props.nodeTypes.forEach((nodeType) => {
+                                                returnList.push(<MenuItem  primaryText={"Link to new " + nodeType.name + " Node"} onTouchTap={() => this.handleNewNodeRequested(nodeType)}/>)
                                             })
                                             return returnList
                                         })()}
@@ -734,7 +751,7 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
                     if (this.state.dialogNewNodeOpen) {
                         return (
                             this.props.dialogFactory.getDialogNodeDetailAsNew(
-                                this.state.dialogNewNodeOpen, this.handleAddNewNode.bind(this), this.handleCloseDialogNewNode.bind(this)
+                                this.state.dialogNewNodeOpen, this.handleAddNewNode.bind(this), this.handleCloseDialogNewNode.bind(this), this.state.newNodeType
                             )
                         )
                     }
@@ -748,7 +765,7 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
                     if (this.state.dialogNewNodeToConnectOpen) {
                         return (
                             this.props.dialogFactory.getDialogNodeDetailAsNewToConnect(
-                                this.state.dialogNewNodeToConnectOpen, this.handleAddNewNodeWithLink.bind(this), this.handleCloseDialogNewNodeToConnect.bind(this)
+                                this.state.dialogNewNodeToConnectOpen, this.handleAddNewNodeWithLink.bind(this), this.handleCloseDialogNewNodeToConnect.bind(this), this.state.newNodeType
                             )
                         )
                     }

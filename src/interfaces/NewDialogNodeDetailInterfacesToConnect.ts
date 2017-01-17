@@ -1,6 +1,6 @@
 import {GraphNodeData} from "../model/GraphNodeData";
 
-export interface DialogNodeDetailToConnectProps {
+export interface NewDialogNodeDetailToConnectProps {
     open: boolean,
     timestamp: string
     node?: GraphNodeData
@@ -9,7 +9,7 @@ export interface DialogNodeDetailToConnectProps {
     asNewDialog: boolean
 }
 
-export interface DialogNodeDetailToConnectState {
+export interface NewDialogNodeDetailToConnectState {
     timestamp?: string
     nodeName?: string
     node?: GraphNodeData
