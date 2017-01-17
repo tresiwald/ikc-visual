@@ -1,12 +1,12 @@
 import {View} from "../model/View";
-import {NewDialogNodeDetailState} from "./NewDialogNodeDetailInterfaces";
-import {NewDialogNodeDetailToConnectState} from "./NewDialogNodeDetailInterfacesToConnect";
+import {DialogNewNodeState} from "./DialogNewNodeInterfaces";
+import {DialogNewNodeDetailToConnectState} from "./DialogNewNodeToConnectInterfaces";
 /**
  * Process certain events in the specific datastructure
  */
 export interface OperationService {
-    createNodeFromDialogState(state: NewDialogNodeDetailState): void
-    createNodeWithLinkFromDialogState(state: NewDialogNodeDetailToConnectState): void
+    createNodeFromDialogState(state: DialogNewNodeState): void
+    createNodeWithLinkFromDialogState(state: DialogNewNodeDetailToConnectState): void
     createNode(id: string, label: string): void;
     createLink(id: string, source: string, target: string, label: string): void;
     updateNode(id: string, label: string): void;

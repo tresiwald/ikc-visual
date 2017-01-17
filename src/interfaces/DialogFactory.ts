@@ -1,16 +1,16 @@
 
 import * as React from "react";
-import {GraphNodeData} from "../model/GraphNodeData";
-import {NewDialogNodeDetailProps, NewDialogNodeDetailState} from "./NewDialogNodeDetailInterfaces";
+import {GraphNodeElement} from "../model/GraphNodeData";
+import {DialogNewNodeProps, DialogNewNodeState} from "./DialogNewNodeInterfaces";
 import {DialogNodeSearchProps, DialogNodeSearchState} from "./DialogNodeSearchInterfaces";
-import {DialogNodeDetailToConnectProps, DialogNodeDetailToConnectState} from "./NewDialogNodeDetailInterfacesToConnect";
+import {DialogNewNodeDetailToConnectProps, DialogNewNodeDetailToConnectState} from "./DialogNewNodeToConnectInterfaces";
 import {DialogNodeSearchToConnectProps, DialogNodeSearchToConnectState} from "./DialogNodeSearchToConnectInterfaces";
 import {GraphNodeType} from "../model/GraphNodeType";
+import {GraphLinkElement} from "../model/GraphLinkData";
 
 export interface DialogFactory{
-    getDialogNodeDetailAsEdit(open: boolean, onSave: Function, onRequestClose:Function, node:GraphNodeData): React.Component<NewDialogNodeDetailProps,NewDialogNodeDetailState>
-    getDialogNodeDetailAsNew(open: boolean, onSave: Function, onRequestClose:Function, type: GraphNodeType): React.Component<NewDialogNodeDetailProps,NewDialogNodeDetailState>
+    getDialogNodeNewNode(open: boolean, onSave: Function, onRequestClose:Function, node:GraphNodeElement, type: GraphNodeType): React.Component<DialogNewNodeProps,DialogNewNodeState>
+    getDialogNodeNewNodeToConnect(open: boolean, onSave: Function, onRequestClose:Function, node:GraphLinkElement, type: GraphNodeType): React.Component<DialogNewNodeDetailToConnectProps,DialogNewNodeDetailToConnectState>
     getDialogNodeSearch(open: boolean, onSelect: Function, onRequestClose:Function): React.Component<DialogNodeSearchProps,DialogNodeSearchState>
-    getDialogNodeDetailAsNewToConnect(open: boolean, onSave: Function, onRequestClose:Function, type: GraphNodeType): React.Component<DialogNodeDetailToConnectProps,DialogNodeDetailToConnectState>
     getDialogNodeSearchToConnect(open: boolean, onSelect: Function, onRequestClose:Function): React.Component<DialogNodeSearchToConnectProps,DialogNodeSearchToConnectState>
 }

@@ -1,7 +1,7 @@
 import * as React from "react";
 import {Dialog, FlatButton} from "material-ui";
 import {TextField} from "material-ui";
-import {DialogNodeDetailProps} from "./interfaces/NewDialogNodeDetailInterfaces";
+import {DialogNodeDetailProps} from "./interfaces/DialogNewNodeInterfaces";
 import {GraphNodeData} from "./model/GraphNodeData";
 import {GuidService} from "./common/GuidService";
 import {
