@@ -1,3 +1,4 @@
+/*
 import * as React from "react";
 import {Dialog, FlatButton} from "material-ui";
 import {TextField} from "material-ui";
@@ -120,4 +121,4 @@ export class DialogNodeSearchToConnect extends React.Component<DialogNodeSearchT
         </Dialog>
     );
     }
-}
+}*/

@@ -1,3 +1,4 @@
+/*
 import * as React from "react";
 import {Dialog, FlatButton} from "material-ui";
 import {TextField} from "material-ui";
@@ -123,4 +124,4 @@ export class DialogNodeDetailToConnect extends React.Component<DialogNodeDetailT
         </Dialog>
     );
     }
-}
+}*/
