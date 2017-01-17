@@ -8,7 +8,7 @@ import {GraphPosition} from "../../model/GraphPosition";
 import {GraphNodeElement, GraphNodeData} from "../../model/GraphNodeData";
 import {GraphLinkElement, GraphLinkData} from "../../model/GraphLinkData";
 import {DialogNewNodeState} from "../../interfaces/DialogNewNodeInterfaces";
-import {DialogNewNodeDetailToConnectState} from "../../interfaces/DialogNewNodeToConnectInterfaces";
+import {DialogNewNodeToConnectState} from "../../interfaces/DialogNewNodeToConnectInterfaces";
 import {DialogNodeSearchToConnectState} from "../../interfaces/DialogNodeSearchToConnectInterfaces";
 import {VISIBILITY} from "../../model/VISIBILITY";
 import ExpandDialog from "../ExpandDialog/ExpandDialog";
@@ -153,7 +153,7 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         })
     }
 
-    handleAddNewNodeWithLink = (state: DialogNewNodeDetailToConnectState) => {
+    handleAddNewNodeWithLink = (state: DialogNewNodeToConnectState) => {
         let nodes = this.state.nodes
         let node = GraphElementFactory.getGraphElementAsNode(state.link.data.target,new GraphPosition(this.state.tappedPosition.x + 10, this.state.tappedPosition.y + 10), VISIBILITY.VISIBLE)
         nodes.set(node.data.id, node)

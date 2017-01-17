@@ -1,7 +1,7 @@
 import {GraphLinkElement} from "../model/GraphLinkData";
 import {GraphNodeType} from "../model/GraphNodeType";
 
-export interface DialogNewNodeDetailToConnectProps {
+export interface DialogNewNodeToConnectProps {
     open: boolean,
     timestamp: string
     link: GraphLinkElement
@@ -10,7 +10,7 @@ export interface DialogNewNodeDetailToConnectProps {
     type: GraphNodeType
 }
 
-export interface DialogNewNodeDetailToConnectState {
+export interface DialogNewNodeToConnectState {
     timestamp?: string
     link: GraphLinkElement
 }
