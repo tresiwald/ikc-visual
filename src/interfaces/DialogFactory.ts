@@ -1,9 +1,9 @@
 
 import * as React from "react";
 import {GraphNodeData} from "../model/GraphNodeData";
-import {DialogNodeDetailProps, DialogNodeDetailState} from "./DialogNodeDetailInterfaces";
+import {DialogNodeDetailProps, DialogNodeDetailState} from "./NewDialogNodeDetailInterfaces";
 import {DialogNodeSearchProps, DialogNodeSearchState} from "./DialogNodeSearchInterfaces";
-import {DialogNodeDetailToConnectProps, DialogNodeDetailToConnectState} from "./DialogNodeDetailInterfacesToConnect";
+import {DialogNodeDetailToConnectProps, DialogNodeDetailToConnectState} from "./NewDialogNodeDetailInterfacesToConnect";
 import {DialogNodeSearchToConnectProps, DialogNodeSearchToConnectState} from "./DialogNodeSearchToConnectInterfaces";
 
 export interface DialogFactory{
