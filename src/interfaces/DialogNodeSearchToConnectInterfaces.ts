@@ -12,5 +12,4 @@ export interface DialogNodeSearchToConnectState {
     nodeName?: string
     timestamp?: string
     link?: GraphLinkData
-    label?: string
 }
