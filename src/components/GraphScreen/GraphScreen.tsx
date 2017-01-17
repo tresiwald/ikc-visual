@@ -143,6 +143,8 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         this.setState({
             nodes: nodes,
             dialogSearchNodeOpen: false
+        },() => {
+            this.saveView()
         })
     }
 
@@ -163,6 +165,8 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
             nodes: nodes,
             links: links,
             dialogNewNodeToConnectOpen: false
+        },() => {
+            this.saveView()
         })
     }
 
@@ -179,21 +183,17 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
 
         links.set(link.data.id, link)
 
-        this.state.nodes = nodes
-        this.state.links = links
-        this.state.dialogSearchNodeToConnectOpen = false
-
         let view = ViewFactory.viewFromMaps(this.state.nodes,this.state.links, this.props.viewToLoad.title)
         view.id = this.props.viewToLoad.id
 
         this.props.operationService.saveView(view)
         this.props.operationService.createLink(state.link.id, this.state.tappedNode.id, state.link.target, state.label)
 
-        /*this.setState({
-            nodes: nodes,
-            links: links,
+        this.setState({
             dialogSearchNodeToConnectOpen: false
-        })*/
+        },() => {
+            this.saveView()
+        })
     }
 
     handleDeleteNodeMobile = (element: any) => {
@@ -222,6 +222,8 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         this.setState({
             nodes: nodes,
             links: links
+        },() => {
+            this.saveView()
         })
     }
 
@@ -258,6 +260,8 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
     handleCloseDialogSearchNode = () => {
         this.setState({
             dialogSearchNodeOpen: false
+        },() => {
+            this.saveView()
         })
     }
 
@@ -332,6 +336,8 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         this.setState({
             links: links,
             nodes: nodes
+        },() => {
+            this.saveView()
         })
     }
 
@@ -367,6 +373,8 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         this.setState({
             links: links,
             nodes: nodes
+        },() => {
+            this.saveView()
         })
     }
 
@@ -427,6 +435,8 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         this.setState({
             links: links,
             nodes: nodes
+        },() => {
+            this.saveView()
         })
     }
 
@@ -451,6 +461,8 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         this.setState({
             links: links,
             nodes: nodes
+        },() => {
+            this.saveView()
         })
     }
 
@@ -475,7 +487,6 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         this.showCoreMenu()
 
         let element = document.getElementById('coreContextDesktopMenu');
-        let visualElement = document.getElementById('ikc-visual');
         element.style.marginLeft = (position.x ) + "px";
         element.style.marginTop = (position.y) + "px";
         (element.childNodes[0] as any).style.width = 'auto'
@@ -488,7 +499,6 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         this.hideCoreMenu()
         this.showNodeMenu();
         let element = document.getElementById('nodeContextDesktopMenu');
-        let visualElement = document.getElementById('ikc-visual');
         element.style.marginLeft = (node.position().x) + "px";
         element.style.marginTop = (node.position().y) + "px";
         (element.childNodes[0] as any).style.width = 'auto';
@@ -524,6 +534,13 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
             node = node.parentNode;
         }
         return false;
+    }
+
+    saveView = () =>{
+        let view = ViewFactory.viewFromMaps(this.state.nodes,this.state.links, this.props.viewToLoad.title)
+        view.id = this.props.viewToLoad.id
+
+        this.props.operationService.saveView(view)
     }
 
 
