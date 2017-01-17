@@ -199,8 +199,9 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
 
         this.state.nodes = nodes
         this.state.links = links
+        this.state.dialogSearchNodeToConnectOpen = false
 
-        this.props.operationService.createLink(state.link.id, this.state.tappedNode.id, state.link.target, link.data.label)
+        this.props.operationService.createLink(state.link.id, this.state.tappedNode.id, state.link.target, state.nodeName)
         this.saveView()
 
         this.forceUpdate()
