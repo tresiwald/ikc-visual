@@ -81,12 +81,11 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
 
         this.onNodePositionUpdated(newLink.data.source, oldSourcePosition)
 
-        this.setState({
-            links: links
-        },() => {
-            this.saveView()
-            this.props.operationService.createLink(newLink.data.id, newLink.data.source, newLink.data.target, newLink.data.label)
-        })
+        this.state.links = links
+        this.props.operationService.createLink(newLink.data.id, newLink.data.source, newLink.data.target, newLink.data.label)
+        this.saveView()
+
+        this.forceUpdate()
     }
 
     onNodeCreated = (newNode: GraphNodeElement) => {
@@ -198,15 +197,13 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
 
         links.set(link.data.id, link)
 
+        this.state.nodes = nodes
+        this.state.links = links
 
-        this.setState({
-            nodes: nodes,
-            links: links,
-            dialogSearchNodeToConnectOpen: false
-        },() => {
-            this.saveView()
-            this.props.operationService.createLink(state.link.id, this.state.tappedNode.id, state.link.target, link.data.label)
-        })
+        this.props.operationService.createLink(state.link.id, this.state.tappedNode.id, state.link.target, link.data.label)
+        this.saveView()
+
+        this.forceUpdate()
     }
 
     handleDeleteNodeMobile = (element: any) => {
@@ -631,7 +628,7 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         let links: GraphLinkElement[] = []
         this.state.links.forEach((link) => {
             if (link.visibility.value == VISIBILITY.VISIBLE.value) {
-                link.data.label = this.props.nodeInformationProvider.getLinkLabel(link.data.source,link.data.id)
+                link.data.label = this.props.nodeInformationProvider.getLinkLabel(link.data.target)
                 links.push(link)
             }
         })
