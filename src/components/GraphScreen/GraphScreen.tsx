@@ -97,6 +97,8 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         this.setState({
             nodes: nodes,
             links: links
+        },() => {
+            this.saveView()
         })
     }
 
@@ -109,6 +111,8 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
 
         this.setState({
             nodes: nodes
+        },() => {
+            this.saveView()
         })
     }
 
@@ -132,6 +136,8 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         this.setState({
             nodes: nodes,
             dialogNewNodeOpen: false
+        },() => {
+            this.saveView()
         })
     }
 
