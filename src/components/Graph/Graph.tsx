@@ -110,7 +110,7 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
         })
 
         if(!(this.props.coreMenu && this.props.nodeMenu)){
-            this.cy.nodes().on('mousedown',function (e:any){
+            this.cy.nodes().on('click',function (e:any){
                 if(!e.cyTarget.hasClass('parent')){
                     that.props.onNodeDetailRequest(e.cyTarget.data())
                 }
