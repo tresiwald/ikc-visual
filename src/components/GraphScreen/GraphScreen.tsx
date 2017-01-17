@@ -76,8 +76,17 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
     }
 
     onLinkCreated = (newLink: GraphLinkElement, oldSourcePosition: GraphPosition) => {
-        this.state.links.set(newLink.data.id, newLink)
+        let links = this.state.links
+        links.set(newLink.data.id, newLink)
+
         this.onNodePositionUpdated(newLink.data.source, oldSourcePosition)
+
+        this.setState({
+            links: links
+        },() => {
+            this.saveView()
+            this.props.operationService.createLink(newLink.data.id, newLink.data.source, newLink.data.target, newLink.data.label)
+        })
     }
 
     onNodeCreated = (newNode: GraphNodeElement) => {
