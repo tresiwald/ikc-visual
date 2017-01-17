@@ -741,7 +741,7 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
                                 this.state.dialogNewNodeToConnectOpen,
                                 this.handleAddNewNodeWithLink.bind(this),
                                 this.handleCloseDialogNewNodeToConnect.bind(this),
-                                GraphElementFactory.getGraphElementAsLink(TimeService.getTimestamp(), this.state.tappedNode.id,"", VISIBILITY.VISIBLE),
+                                GraphElementFactory.getGraphElementAsLink(TimeService.getTimestamp(), this.state.tappedNode.id,TimeService.getTimestamp(), VISIBILITY.VISIBLE),
                                 this.state.newNodeType
                             )
                         )

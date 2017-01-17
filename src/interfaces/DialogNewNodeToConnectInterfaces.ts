@@ -12,5 +12,5 @@ export interface DialogNewNodeToConnectProps {
 
 export interface DialogNewNodeToConnectState {
     timestamp?: string
-    link: GraphLinkElement
+    link?: GraphLinkElement
 }
