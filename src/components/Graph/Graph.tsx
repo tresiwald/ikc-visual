@@ -1,11 +1,11 @@
 import * as React from "react";
 import {GraphProps, GraphState} from "./GraphInterfaces";
-import {GuidService} from "../../common/GuidService";
 import {GraphElementFactory} from "../../model/GraphElementFactory";
 import {GraphPosition} from "../../model/GraphPosition";
 import {GraphLinkData} from "../../model/GraphLinkData";
 import {VISIBILITY} from "../../model/VISIBILITY";
 import getMuiTheme = __MaterialUI.Styles.getMuiTheme;
+import {TimeService} from "../../common/TimeService";
 
 let cytoscape = require('cytoscape');
 let cytoscapeCtxmenu = require('cytoscape-cxtmenu');
@@ -141,7 +141,7 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
                 if (targetNode.id()) {
                     console.log("add link between" + node.id() + " and " + targetNode.id());
                     that.props.onNewLink(
-                        GraphElementFactory.getGraphElementAsLink(GuidService.getRandomGuid(), node.id(), targetNode.id(),VISIBILITY.VISIBLE),
+                        GraphElementFactory.getGraphElementAsLink(TimeService.getTimestamp(), node.id(), targetNode.id(),VISIBILITY.VISIBLE),
                         oldPos
                     )
                     that.state.oldPosition.delete(node.id())
@@ -234,7 +234,7 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
                     )
                 )
                 this.props.onNewLink(
-                    GraphElementFactory.getGraphElementAsLink(GuidService.getRandomGuid(), node.id(), event.id,VISIBILITY.VISIBLE),
+                    GraphElementFactory.getGraphElementAsLink(TimeService.getTimestamp(), node.id(), event.id,VISIBILITY.VISIBLE),
                     node.position()
                 )
             }
