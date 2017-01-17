@@ -1,4 +1,5 @@
 import {GraphLinkElement} from "../model/GraphLinkData";
+import {GraphNodeType} from "../model/GraphNodeType";
 
 export interface DialogNewNodeDetailToConnectProps {
     open: boolean,
@@ -6,7 +7,7 @@ export interface DialogNewNodeDetailToConnectProps {
     link: GraphLinkElement
     onSave: Function
     onRequestClose: Function
-    type: string
+    type: GraphNodeType
 }
 
 export interface DialogNewNodeDetailToConnectState {
