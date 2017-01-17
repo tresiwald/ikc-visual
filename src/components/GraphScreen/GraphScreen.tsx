@@ -490,6 +490,7 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         let element = document.getElementById('coreContextDesktopMenu');
         element.style.marginLeft = (position.x ) + "px";
         element.style.marginTop = (position.y) + "px";
+        element.style.zIndex = '99999';
         (element.childNodes[0] as any).style.width = 'auto'
     }
 
@@ -502,6 +503,7 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         let element = document.getElementById('nodeContextDesktopMenu');
         element.style.marginLeft = (node.position().x) + "px";
         element.style.marginTop = (node.position().y) + "px";
+        element.style.zIndex = '99999';
         (element.childNodes[0] as any).style.width = 'auto';
     }
 

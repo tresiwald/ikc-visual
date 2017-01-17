@@ -116,12 +116,12 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
                 }
             })
             this.cy.nodes().on('cxttap',function (e:any){
-                e.cyTarget._private.position = new GraphPosition(e.cyTarget.position().x  - that.state.pan.x, e.cyTarget.position().y - that.state.pan.y)
+                e.cyTarget._private.position = new GraphPosition(e.cyTarget.position().x  + that.state.pan.x, e.cyTarget.position().y + that.state.pan.y)
                 that.props.onNodeDesktopMenuRequested(e.cyTarget)
             })
             this.cy.on('cxttap',function (e:any){
                 if(!e.cyTarget.id) {
-                    let position  = new GraphPosition(e.cyPosition.x - that.state.pan.x, e.cyPosition.y - that.state.pan.y)
+                    let position  = new GraphPosition(e.cyPosition.x + that.state.pan.x, e.cyPosition.y + that.state.pan.y)
                     that.props.onCoreDesktopMenuRequested(position)
                 }
             })
@@ -223,7 +223,7 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
             }
         });
 
-        let tmpNodePosition = this.cy.$('#tmp').position()
+        let tmpNodePosition = new GraphPosition(this.cy.$('#tmp').position().x + that.state.pan.x, this.cy.$('#tmp').position().y + that.state.pan.y)
 
         this.cy.$('#tmp').remove()
 
