@@ -15,7 +15,7 @@ export interface  GraphScreenProps {
     timestamp: string;
     dialogFactory: DialogFactory;
     onNodeDetailRequest: Function;
-    nodeTypesCreateFunctions?: Map<string, Function>
+    nodeTypesCreateFunctions?: Map<string, string>
 }
 
 export interface  GraphScreenStats {

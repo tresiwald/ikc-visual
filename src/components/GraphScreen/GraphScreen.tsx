@@ -82,8 +82,8 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         this.onNodePositionUpdated(newLink.data.source, oldSourcePosition)
 
         this.state.links = links
-        this.props.operationService.createLink(newLink.data.id, newLink.data.source, newLink.data.target, newLink.data.label)
         this.saveView()
+        this.props.operationService.createLink(newLink.data.id, newLink.data.source, newLink.data.target, "")
 
         this.forceUpdate()
     }
@@ -201,8 +201,8 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         this.state.links = links
         this.state.dialogSearchNodeToConnectOpen = false
 
-        this.props.operationService.createLink(state.link.id, this.state.tappedNode.id, state.link.target, state.nodeName)
         this.saveView()
+        this.props.operationService.createLink(state.link.id, this.state.tappedNode.id, state.link.target, state.nodeName)
 
         this.forceUpdate()
     }
@@ -710,16 +710,16 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
                     } else {
                         return (
                             <Graph
-                            nodes={nodes}
-                            links={links}
-                            coreMenu={coreMenu}
-                            nodeMenu={nodeMenu}
-                            onNewNode={this.onNodeCreated.bind(this)}
-                            onNewLink={this.onLinkCreated.bind(this)}
-                            onNodePositionUpdate={this.onNodePositionUpdated.bind(this)}
-                            onEdgesCollapse={this.handleLinksCollapse.bind(this)}
-                            onFilterWindowRequested={this.handleFilterWindowRequest.bind(this)}
-                        />)
+                                nodes={nodes}
+                                links={links}
+                                coreMenu={coreMenu}
+                                nodeMenu={nodeMenu}
+                                onNewNode={this.onNodeCreated.bind(this)}
+                                onNewLink={this.onLinkCreated.bind(this)}
+                                onNodePositionUpdate={this.onNodePositionUpdated.bind(this)}
+                                onEdgesCollapse={this.handleLinksCollapse.bind(this)}
+                                onFilterWindowRequested={this.handleFilterWindowRequest.bind(this)}
+                            />)
                     }
                 })()}
 

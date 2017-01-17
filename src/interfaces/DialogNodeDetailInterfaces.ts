@@ -1,17 +1,15 @@
 import {GraphNodeData} from "../model/GraphNodeData";
 
-export interface DialogNodeDetailProps {
+export interface NewDialogNodeDetailProps {
     open: boolean,
     timestamp: string
     node?: GraphNodeData
     onSave: Function
     onRequestClose: Function
-    asNewDialog: boolean
+    type: string
 }
 
-export interface DialogNodeDetailState {
+export interface NewDialogNodeDetailState {
     timestamp?: string
-    nodeName?: string
     node?: GraphNodeData
-
 }
