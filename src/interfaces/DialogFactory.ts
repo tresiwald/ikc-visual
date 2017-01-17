@@ -10,7 +10,7 @@ import {GraphLinkElement} from "../model/GraphLinkData";
 
 export interface DialogFactory{
     getDialogNodeNewNode(open: boolean, onSave: Function, onRequestClose:Function, node:GraphNodeElement, type: GraphNodeType): React.Component<DialogNewNodeProps,DialogNewNodeState>
-    getDialogNodeNewNodeToConnect(open: boolean, onSave: Function, onRequestClose:Function, node:GraphLinkElement, type: GraphNodeType): React.Component<DialogNewNodeDetailToConnectProps,DialogNewNodeDetailToConnectState>
+    getDialogNodeNewNodeToConnect(open: boolean, onSave: Function, onRequestClose:Function, link:GraphLinkElement, type: GraphNodeType): React.Component<DialogNewNodeDetailToConnectProps,DialogNewNodeDetailToConnectState>
     getDialogNodeSearch(open: boolean, onSelect: Function, onRequestClose:Function): React.Component<DialogNodeSearchProps,DialogNodeSearchState>
     getDialogNodeSearchToConnect(open: boolean, onSelect: Function, onRequestClose:Function): React.Component<DialogNodeSearchToConnectProps,DialogNodeSearchToConnectState>
 }
