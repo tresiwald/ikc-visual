@@ -631,7 +631,7 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         let links: GraphLinkElement[] = []
         this.state.links.forEach((link) => {
             if (link.visibility.value == VISIBILITY.VISIBLE.value) {
-                link.data.label = this.props.nodeInformationProvider.getLinkLabel(link.data.id)
+                link.data.label = this.props.nodeInformationProvider.getLinkLabel(link.data.source,link.data.id)
                 links.push(link)
             }
         })
