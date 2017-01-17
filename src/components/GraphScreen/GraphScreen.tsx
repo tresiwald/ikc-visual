@@ -197,7 +197,7 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
             TimeService.getTimestamp(), this.state.tappedNode.id, state.link.target, VISIBILITY.VISIBLE)
 
         links.set(link.data.id, link)
-        this.props.operationService.createLink(state.link.id, this.state.tappedNode.id, state.link.target, state.label)
+        this.props.operationService.createLink(state.link.id, this.state.tappedNode.id, state.link.target, link.data.label)
 
 
         this.setState({
