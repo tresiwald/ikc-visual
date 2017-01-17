@@ -671,7 +671,7 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
                                         {(()=> {
                                             let returnList:any[] = []
                                             this.props.nodeTypes.forEach((nodeType) => {
-                                                returnList.push(<MenuItem   primaryText={"Add new " + nodeType.name + " Node"} onTouchTap={() => this.handleNewNodeRequestedToConnect(nodeType)}/>)
+                                                returnList.push(<MenuItem   primaryText={"Add new " + nodeType.name + " Node"} onTouchTap={() => this.handleNewNodeRequested(nodeType)}/>)
                                             })
                                             return returnList
                                         })()}
@@ -699,7 +699,7 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
                                         {(()=> {
                                             let returnList:any[] = []
                                             this.props.nodeTypes.forEach((nodeType) => {
-                                                returnList.push(<MenuItem  primaryText={"Link to new " + nodeType.name + " Node"} onTouchTap={() => this.handleNewNodeRequested(nodeType)}/>)
+                                                returnList.push(<MenuItem  primaryText={"Link to new " + nodeType.name + " Node"} onTouchTap={() => this.handleNewNodeRequestedToConnect(nodeType)}/>)
                                             })
                                             return returnList
                                         })()}
