@@ -22,4 +22,5 @@ export interface GraphProps {
 export interface GraphState {
     oldPosition?: Map<string, GraphPosition>
     pan?: GraphPosition
+    toolbarVisible?: boolean
 }

@@ -6,6 +6,7 @@ import {GraphLinkData} from "../../model/GraphLinkData";
 import {VISIBILITY} from "../../model/VISIBILITY";
 import getMuiTheme = __MaterialUI.Styles.getMuiTheme;
 import {TimeService} from "../../common/TimeService";
+import {FlatButton} from "material-ui";
 
 let cytoscape = require('cytoscape');
 let cytoscapeCtxmenu = require('cytoscape-cxtmenu');
@@ -109,6 +110,11 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
             that.state.pan = e.cy.pan()
         })
 
+        this.cy.edges().on('select', function () {
+            let element = document.getElementById('toolbar')
+            element.style.visibility = 'visible'
+        })
+
         if(!(this.props.coreMenu && this.props.nodeMenu)){
             this.cy.nodes().on('click',function (e:any){
                 if(!e.cyTarget.hasClass('parent')){
@@ -132,7 +138,7 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
 
             let node = e.cyTarget;
             let oldPos = new GraphPosition(node.position('x'), node.position('y'))
-            node.on('free', function (event: any) {
+            node.one('free', function (event: any) {
                 let targetNode = that.cy.filter(function (i: number, element: any) {
                     if (element.isNode() && element.id() != node.id() && that.close(node.position(), element.position())) {
                         return true
@@ -154,7 +160,7 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
                         new GraphPosition(node.position('x'), node.position('y'))
                     )
                 }
-                node.off('free')
+                //node.off('free')
             });
 
         });
@@ -175,21 +181,17 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
 
     componentDidUpdate() {
         this.renderCytoscapeElement();
+        this.createToolBar()
+    }
+
+    createToolBar(){
+        this.state.toolbarVisible = true
     }
 
     componentDidMount() {
         this.renderCytoscapeElement();
         registerDropZone(this.externalDrop.bind(this))
-
-        let that = this
-        let div = document.createElement('div')
-        div.id = 'toolbar'
-        div.innerHTML = "COLLAPSE"
-        div.addEventListener('click', function () {
-            let selectedEdges = that.cy.$("edge:selected");
-            that.collapseEdges(selectedEdges)
-        })
-        document.getElementById('ikc-visual').appendChild(div)
+        this.createToolBar()
     }
 
     close(free: any, target: any) {
@@ -223,7 +225,7 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
             }
         });
 
-        let tmpNodePosition = new GraphPosition(this.cy.$('#tmp').position().x + that.state.pan.x, this.cy.$('#tmp').position().y + that.state.pan.y)
+        let tmpNodePosition = this.cy.$('#tmp').position()
 
         this.cy.$('#tmp').remove()
 
@@ -266,10 +268,25 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
         }
     }
 
+    handleClickOnCollapse = () => {
+        let selectedEdges = this.cy.$("edge:selected");
+        this.collapseEdges(selectedEdges)
+    }
+
     render() {
         return (
             <div>
                 <div id="ikc-visual"></div>
+                {(() => {
+                    if(this.state.toolbarVisible){
+                        return (
+                            <FlatButton
+                                label = 'COLLAPSE'
+                                onTouchTap = {this.handleClickOnCollapse.bind(this)}
+                            />
+                        )
+                    }
+                })()}
             </div>
         )
     }
