@@ -68,7 +68,7 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
                         'edge-text-rotation': 'autorotate'
                     }
                 }, {
-                    selector: 'edge:selected',
+                    selector: 'edge.selected',
                     style: {
                         'target-arrow-shape': 'triangle',
                         'line-color': '#CC11AA',
@@ -261,21 +261,21 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
     }
 
     /*collapseEdges(edges: any) {
-        if(edges.length == 1){
-            this.props.onLinksCollapse([edges.data()])
-        }else{
-            let list:GraphLinkData[] = []
-            edges.forEach((edge:any) =>{
-                list.push(edge.data())
-            })
-            this.props.onLinksCollapse(list)
-        }
-    }*/
+     if(edges.length == 1){
+     this.props.onLinksCollapse([edges.data()])
+     }else{
+     let list:GraphLinkData[] = []
+     edges.forEach((edge:any) =>{
+     list.push(edge.data())
+     })
+     this.props.onLinksCollapse(list)
+     }
+     }*/
 
     /*handleClickOnCollapse = () => {
-        let selectedEdges = this.cy.$("edge:selected");
-        this.collapseEdges(selectedEdges)
-    }*/
+     let selectedEdges = this.cy.$("edge:selected");
+     this.collapseEdges(selectedEdges)
+     }*/
 
     render() {
         return (
