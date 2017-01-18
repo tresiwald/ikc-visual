@@ -4,7 +4,7 @@ import {GraphNodeData} from "../model/GraphNodeData";
  */
 export interface NodeInformationProvider {
     getNodeTitle(id: string): string;
-    getLinkLabel(target: string): string;
+    getLinkLabel(targetId: string, linkId: string): string;
     getNodeTitles(ids: string[]): string[];
     getNodeLinkIds(id: string[]): string[];
 }

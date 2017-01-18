@@ -23,7 +23,8 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         this.state = {
             nodes: new Map<string, GraphNodeElement>(),
             links: new Map<string, GraphLinkElement>(),
-            dialogEditNodeOpen: false
+            dialogEditNodeOpen: false,
+            showLabels: false
         }
         let that = this
         if (!this.isMobile.any()) {
@@ -601,11 +602,41 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
                 link.visibility = VISIBILITY.GROUPED
                 link.linkClasses.splice(indexOfClass, 1)
 
-                let node = nodes.get(link.data.target)
-                node.visibility = VISIBILITY.GROUPED
-                nodes.set(node.data.id, node)
+                let targetNode = nodes.get(link.data.target)
+                targetNode.visibility = VISIBILITY.GROUPED
+                nodes.set(targetNode.data.id, targetNode)
+
+                let sourceNode = nodes.get(link.data.source)
+                sourceNode.nodeClasses.push('parent')
+                nodes.set(sourceNode.data.id, sourceNode)
             }
 
+        })
+
+        this.setState({
+            links: links,
+            nodes: nodes,
+            collapseToolbarNeeded: false
+        })
+    }
+
+
+    handleCollapseAll = () => {
+        let links = this.state.links
+        let nodes = this.state.nodes
+
+        let sourceNode = nodes.get(this.state.tappedNode.id)
+        sourceNode.nodeClasses.push('parent')
+        nodes.set(sourceNode.data.id, sourceNode)
+
+        links.forEach((link) => {
+            if (link.visibility == VISIBILITY.VISIBLE && link.data.source == this.state.tappedNode.id) {
+                link.visibility = VISIBILITY.GROUPED
+
+                let targetNode = nodes.get(link.data.target)
+                targetNode.visibility = VISIBILITY.GROUPED
+                nodes.set(targetNode.data.id, targetNode)
+            }
         })
 
         this.setState({
@@ -744,6 +775,10 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
                                         <MenuItem primaryText="Remove Node from View" onTouchTap={()=>{
                                             this.hideNodeMenu()
                                             this.handleDeleteNodeDesktop()
+                                        }}/>
+                                        <MenuItem primaryText="Collapse All" onTouchTap={() => {
+                                            this.hideNodeMenu()
+                                            this.handleCollapseAll()
                                         }}/>
                                         <MenuItem primaryText="Link to existing Node" onTouchTap={()=>{
                                             this.hideNodeMenu()

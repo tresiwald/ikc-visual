@@ -17,6 +17,7 @@ export interface GraphProps {
     onCoreDesktopMenuRequested?:Function
     onNodeDesktopMenuRequested?:Function
     onLinkSelected?:Function
+    onPanChanged?:Function
 }
 
 export interface GraphState {

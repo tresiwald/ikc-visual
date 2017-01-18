@@ -59,7 +59,7 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
                     selector: 'edge',
                     style: {
                         'width': 1,
-                        //'label': 'data(label)',
+                        'label': 'data(label)',
                         'target-arrow-shape': 'triangle',
                         'line-color': '#9dbaea',
                         'target-arrow-color': '#9dbaea',
