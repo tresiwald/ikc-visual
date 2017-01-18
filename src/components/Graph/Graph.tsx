@@ -99,6 +99,16 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
             }
         })
 
+        this.cy.edges().forEach((link:any)=> {
+            let inputLink = that.props.links.filter((n) => n.data.id == link.id())[0]
+            if (inputLink.linkClasses.length) {
+                inputLink.linkClasses.forEach((c: any) => {
+                    link.addClass(c)
+
+                })
+            }
+        })
+
 
         // save position on tap
         this.cy.on('taphold', function (e: any) {
@@ -110,9 +120,8 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
             that.state.pan = e.cy.pan()
         })
 
-        this.cy.edges().on('select', function () {
-            let element = document.getElementById('toolbar')
-            element.style.visibility = 'visible'
+        this.cy.edges().on('click', function (e:any) {
+            that.props.onLinkSelected(e.cyTarget)
         })
 
         if(!(this.props.coreMenu && this.props.nodeMenu)){
@@ -167,6 +176,7 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
 
         this.cy.on('tap', 'node.parent', function (evt: any) {
             let node = evt.cyTarget;
+            let position = new GraphPosition(node.position().x + that.state.pan.x ,node.position().y + that.state.pan.y)
             that.props.onFilterWindowRequested(GraphElementFactory.getNode(node.data(),node.position(), VISIBILITY.VISIBLE))
 
         });
@@ -181,17 +191,11 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
 
     componentDidUpdate() {
         this.renderCytoscapeElement();
-        this.createToolBar()
-    }
-
-    createToolBar(){
-        this.state.toolbarVisible = true
     }
 
     componentDidMount() {
         this.renderCytoscapeElement();
         registerDropZone(this.externalDrop.bind(this))
-        this.createToolBar()
     }
 
     close(free: any, target: any) {
@@ -256,37 +260,27 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
 
     }
 
-    collapseEdges(edges: any) {
+    /*collapseEdges(edges: any) {
         if(edges.length == 1){
-            this.props.onEdgesCollapse([edges.data()])
+            this.props.onLinksCollapse([edges.data()])
         }else{
             let list:GraphLinkData[] = []
             edges.forEach((edge:any) =>{
                 list.push(edge.data())
             })
-            this.props.onEdgesCollapse(list)
+            this.props.onLinksCollapse(list)
         }
-    }
+    }*/
 
-    handleClickOnCollapse = () => {
+    /*handleClickOnCollapse = () => {
         let selectedEdges = this.cy.$("edge:selected");
         this.collapseEdges(selectedEdges)
-    }
+    }*/
 
     render() {
         return (
             <div>
                 <div id="ikc-visual"></div>
-                {(() => {
-                    if(this.state.toolbarVisible){
-                        return (
-                            <FlatButton
-                                label = 'COLLAPSE'
-                                onTouchTap = {this.handleClickOnCollapse.bind(this)}
-                            />
-                        )
-                    }
-                })()}
             </div>
         )
     }

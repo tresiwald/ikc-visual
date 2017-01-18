@@ -16,6 +16,7 @@ import {TimeService} from "../../common/TimeService";
 import {Menu, MenuItem, Paper} from "material-ui";
 import {ViewFactory} from "../../model/ViewFactory";
 import {GraphNodeType} from "../../model/GraphNodeType";
+import {FlatButton} from "material-ui";
 
 export default class GraphScreen extends React.Component<GraphScreenProps, GraphScreenStats> {
     constructor(props: any) {
@@ -446,7 +447,7 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         let nodes = this.state.nodes
 
         links.forEach((link) => {
-            if (link.data.source == nodeId) {
+            if (link.data.source == nodeId && link.visibility == VISIBILITY.GROUPED) {
                 link.visibility = VISIBILITY.VISIBLE
 
                 let node = nodes.get(link.data.target)
@@ -576,6 +577,35 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         })
     }
 
+    onLinkSelected = (e:GraphLinkElement) => {
+        let links = this.state.links
+        let link = links.get(e.data.id)
+        link.linkClasses.push('selected')
+        links.set(link.data.id, link)
+
+        this.saveView()
+
+        this.setState({
+            links: links,
+            toolbarVisible: true
+        })
+    }
+
+    handleClickOnCollapse = () => {
+        let links = this.state.links
+        links.forEach((link) => {
+            let indexOfClass = link.linkClasses.indexOf('selected')
+            if(indexOfClass >= 0){
+                link.visibility = VISIBILITY.GROUPED
+                link.linkClasses.splice(indexOfClass,1)
+            }
+        })
+
+        this.setState({
+            links: links
+        })
+    }
+
     render() {
         this.initState()
         let that = this
@@ -655,7 +685,6 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
                                     onNewNode={this.onNodeCreated.bind(this)}
                                     onNewLink={this.onLinkCreated.bind(this)}
                                     onNodePositionUpdate={this.onNodePositionUpdated.bind(this)}
-                                    onEdgesCollapse={this.handleLinksCollapse.bind(this)}
                                     onFilterWindowRequested={this.handleFilterWindowRequest.bind(this)}
                                     onCoreDesktopMenuRequested={this.showCoreContextDesktopMenu.bind(this)}
                                     onNodeDesktopMenuRequested={this.showNodeContextDesktopMenu.bind(this)}
@@ -719,7 +748,6 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
                                 onNewNode={this.onNodeCreated.bind(this)}
                                 onNewLink={this.onLinkCreated.bind(this)}
                                 onNodePositionUpdate={this.onNodePositionUpdated.bind(this)}
-                                onEdgesCollapse={this.handleLinksCollapse.bind(this)}
                                 onFilterWindowRequested={this.handleFilterWindowRequest.bind(this)}
                             />)
                     }
@@ -784,6 +812,18 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
                         } else {
                             this.state.filterWindowOpen = false
                         }
+                    }
+                })()}
+                {(() => {
+                    if(this.state.toolbarVisible){
+                        return(
+                            <div id="toolbar">
+                                <FlatButton
+                                    label = 'COLLAPSE'
+                                    onTouchTap = {this.handleClickOnCollapse.bind(this)}
+                                />
+                            </div>
+                        )
                     }
                 })()}
 

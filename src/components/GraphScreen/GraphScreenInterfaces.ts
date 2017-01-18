@@ -33,4 +33,5 @@ export interface  GraphScreenStats {
     filterWindowOpen?: boolean;
     filterWindowNode?:GraphNodeElement;
     newNodeType?: GraphNodeType
+    toolbarVisible?: boolean
 }

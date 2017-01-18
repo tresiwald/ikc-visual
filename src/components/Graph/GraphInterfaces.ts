@@ -12,11 +12,11 @@ export interface GraphProps {
     onNewNode: Function
     onNewLink: Function
     onNodePositionUpdate: Function
-    onEdgesCollapse?: Function
     onFilterWindowRequested?: Function
     onNodeDetailRequest?: Function
     onCoreDesktopMenuRequested?:Function
     onNodeDesktopMenuRequested?:Function
+    onLinkSelected?:Function
 }
 
 export interface GraphState {
