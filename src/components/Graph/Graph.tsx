@@ -131,8 +131,8 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
                 }
             })
             this.cy.nodes().on('cxttap',function (e:any){
-                e.cyTarget._private.position = new GraphPosition(e.cyTarget.position().x  + that.state.pan.x, e.cyTarget.position().y + that.state.pan.y)
-                that.props.onNodeDesktopMenuRequested(e.cyTarget)
+                let clone = GraphElementFactory.getNode(e.cyTarget.data(), new GraphPosition(e.cyTarget.position().x  + that.state.pan.x, e.cyTarget.position().y + that.state.pan.y),VISIBILITY.VISIBLE)
+                that.props.onNodeDesktopMenuRequested(clone)
             })
             this.cy.on('cxttap',function (e:any){
                 if(!e.cyTarget.id) {
@@ -174,12 +174,12 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
 
         });
 
-        this.cy.on('tap', 'node.parent', function (evt: any) {
+        /*this.cy.on('tap', 'node.parent', function (evt: any) {
             let node = evt.cyTarget;
             let position = new GraphPosition(node.position().x + that.state.pan.x ,node.position().y + that.state.pan.y)
             that.props.onFilterWindowRequested(GraphElementFactory.getNode(node.data(),node.position(), VISIBILITY.VISIBLE))
 
-        });
+        });*/
 
         // add contextmenu
         if(this.props.nodeMenu && this.props.coreMenu) {
@@ -264,11 +264,11 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
      if(edges.length == 1){
      this.props.onLinksCollapse([edges.data()])
      }else{
-     let list:GraphLinkData[] = []
+     let nodes:GraphLinkData[] = []
      edges.forEach((edge:any) =>{
-     list.push(edge.data())
+     nodes.push(edge.data())
      })
-     this.props.onLinksCollapse(list)
+     this.props.onLinksCollapse(nodes)
      }
      }*/
 

@@ -12,7 +12,6 @@ export interface GraphProps {
     onNewNode: Function
     onNewLink: Function
     onNodePositionUpdate: Function
-    onFilterWindowRequested?: Function
     onNodeDetailRequest?: Function
     onCoreDesktopMenuRequested?:Function
     onNodeDesktopMenuRequested?:Function

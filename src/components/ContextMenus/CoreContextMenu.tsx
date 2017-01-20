@@ -10,32 +10,25 @@ import render = __React.__DOM.render;
 import getMuiTheme = __MaterialUI.Styles.getMuiTheme;
 import {Menu} from "material-ui";
 import {MenuItem} from "material-ui";
+import {GraphNodeData} from "../../model/GraphNodeData";
 
-export interface ExpandDialogProps {
-    list: GraphLinkData[],
+export interface CoreContextMenuProps {
+    nodes: GraphNodeData[]
     timestamp: string,
-    focus?: boolean,
-    onExpandNode: Function,
-    onExpandAll: Function,
     requestClose: Function,
     position: GraphPosition,
-    graphNodeTypes: GraphNodeType[]
+    graphNodeTypes: GraphNodeType[],
 }
-export interface ExpandDialogState {
-    searchResults?: GraphLinkData[],
-    searchText?: string,
-    timestamp?: string,
+export interface CoreContextMenuState {
+    timestamp?: string
     active?: boolean
 }
 
-export default class ExpandDialog extends React.Component<ExpandDialogProps,ExpandDialogState> {
+export default class CoreContextMenu extends React.Component<CoreContextMenuProps,CoreContextMenuState> {
     constructor(props: any) {
         super(props);
         this.state = {
-            searchText: "",
-            searchResults: [],
             timestamp: "",
-            active: false
         };
 
     }
@@ -47,11 +40,9 @@ export default class ExpandDialog extends React.Component<ExpandDialogProps,Expa
     }
 
     componentWillMount = () => {
-        this.state.active = true
-        this.performSearch()
         let that = this
         document.addEventListener('click', function handler(event: any) {
-            let element = document.getElementById('expandPaper')
+            let element = document.getElementById('coreContextMenu')
             if (element) {
                 let box = element.getBoundingClientRect()
                 if (!(event.clientX > box.left && event.clientX < box.right && event.clientY > box.top && event.clientY < box.bottom)) {
@@ -62,51 +53,12 @@ export default class ExpandDialog extends React.Component<ExpandDialogProps,Expa
         })
     }
 
-    componentWillUnmount = () => {
-        this.state.active = false
-    }
-
-
-    handleSearchTextUpdate = (event: any) => {
-        this.setState({
-                searchText: event.target.value
-            },
-            () => {
-                this.performSearch()
-            });
-    };
-
-    handleExpandNode = (result: GraphLinkData) => {
-        this.props.onExpandNode(result.id)
-    }
-
-    handleExpandAll = () => {
-        this.props.onExpandAll(this.props.list[0].source)
-    }
-
-    performSearch = () => {
-        if (this.state.active) {
-            let tmpResults: GraphLinkData[] = [];
-            if (this.state.searchText == '') {
-                tmpResults = this.props.list
-            } else {
-                this.props.list.forEach((item) => {
-                    if (item.target.indexOf(this.state.searchText) >= 0) {
-                        tmpResults.push(item)
-                    }
-                })
-            }
-            this.state.searchResults = tmpResults
-        }
-    }
-
     onRequestClose = () =>{
         this.props.requestClose()
     }
 
     render() {
         this.initState();
-        this.performSearch()
         const styles = {
             iconHover: {
                 color: "#4591bc"
@@ -132,23 +84,8 @@ export default class ExpandDialog extends React.Component<ExpandDialogProps,Expa
         };
 
         return (
-            <MuiThemeProvider>
                 <div>
-                    <Paper id="expandPaper" style={styles.position}>
-                        <TextField
-                            hintText="Search text ..."
-                            value={this.state.searchText}
-                            onChange={this.handleSearchTextUpdate}
-                            underlineFocusStyle={styles.underlineStyle}
-                            fullWidth={true}
-                            ref={(() => {
-                        if(this.props.focus){
-                            return focusInput
-                        }else{
-                            return null
-                        }
-                    })()}
-                        />
+                    <Paper id="coreContextMenu" style={styles.position}>
                         <List>
                             <ListItem primaryText = "Menu" children={
                             <Menu>
@@ -179,25 +116,9 @@ export default class ExpandDialog extends React.Component<ExpandDialogProps,Expa
                                 })()}
                             </Menu>
                         }/>
-                            {
-                                this.state.searchResults.map((result) => {
-                                    return <ListItem
-                                        primaryText={result.target}
-                                        secondaryText={result.label}
-                                        rightIconButton={
-                                            <IconButton onTouchTap={() => this.handleExpandNode(result)}>
-                                            <MapsZoomOutMap></MapsZoomOutMap>
-                                            </IconButton>
-                                        }
-                                    ></ListItem>
-                                })
-                            }
                         </List>
-                        <FlatButton label="Cancel" onTouchTap={this.onRequestClose}/>
-                        <FlatButton label="Expand All" onTouchTap={this.handleExpandAll}/>
                     </Paper>
                 </div>
-            </MuiThemeProvider>
         )
     }
 }

@@ -23,15 +23,14 @@ export interface  GraphScreenStats {
     nodes?: Map<string, GraphNodeElement>;
     links?: Map<string, GraphLinkElement>;
     timestamp?: string;
-    dialogEditNodeOpen?: boolean;
     dialogNewNodeOpen?: boolean;
     dialogSearchNodeOpen?: boolean;
     dialogNewNodeToConnectOpen?: boolean;
     dialogSearchNodeToConnectOpen?: boolean;
     tappedNode?: GraphNodeData;
     tappedPosition?: GraphPosition;
-    filterWindowOpen?: boolean;
-    filterWindowNode?:GraphNodeElement;
+    coreContextMenuOpen?:boolean;
+    nodeContextMenuOpen?:boolean;
     newNodeType?: GraphNodeType
     collapseToolbarNeeded?: boolean
     showLabels?:boolean

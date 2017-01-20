@@ -16,6 +16,8 @@ import {TimeService} from "../../common/TimeService";
 import {Menu, MenuItem, Paper, FlatButton} from "material-ui";
 import {ViewFactory} from "../../model/ViewFactory";
 import {GraphNodeType} from "../../model/GraphNodeType";
+import CoreContextMenu from "../ContextMenus/CoreContextMenu";
+import NodeContextMenu from "../ContextMenus/NodeContextMenu";
 
 export default class GraphScreen extends React.Component<GraphScreenProps, GraphScreenStats> {
     constructor(props: any) {
@@ -23,7 +25,6 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         this.state = {
             nodes: new Map<string, GraphNodeElement>(),
             links: new Map<string, GraphLinkElement>(),
-            dialogEditNodeOpen: false,
             showLabels: false
         }
         let that = this
@@ -97,6 +98,23 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
 
         let links = this.state.links
         links.forEach((link) => {
+            if(link.data.source == newNode.data.id){
+                link.visibility = VISIBILITY.VISIBLE
+
+                let targetNode = nodes.get(link.data.target)
+                targetNode.visibility = VISIBILITY.VISIBLE
+                nodes.set(targetNode.data.id, targetNode)
+
+                links.forEach((targetLink) => {
+                    if(targetLink.data.source == targetNode.data.id && nodes.get(targetLink.data.target).visibility.value == VISIBILITY.VISIBLE.value){
+                        targetLink.visibility = VISIBILITY.VISIBLE
+                    }
+                    if(targetLink.data.target == targetNode.data.id && nodes.get(targetLink.data.source).visibility.value == VISIBILITY.VISIBLE.value){
+                        targetLink.visibility = VISIBILITY.VISIBLE
+                    }
+                })
+            }
+
             if (link.data.source == newNode.data.id && nodes.get(link.data.target).visibility.value == VISIBILITY.VISIBLE.value) {
                 link.visibility = VISIBILITY.VISIBLE
             }
@@ -145,11 +163,39 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
 
     handleAddExistingNode = (state: DialogNewNodeState) => {
         let nodes = this.state.nodes
+        let links = this.state.links
+
         let node = state.node
         nodes.set(node.data.id, node)
 
+        links.forEach((link) => {
+            if(link.data.source == state.node.data.id){
+                link.visibility = VISIBILITY.VISIBLE
+
+                let targetNode = nodes.get(link.data.target)
+                targetNode.visibility = VISIBILITY.VISIBLE
+                nodes.set(targetNode.data.id, targetNode)
+
+                links.forEach((targetLink) => {
+                    if(targetLink.data.source == targetNode.data.id && nodes.get(targetLink.data.target).visibility.value == VISIBILITY.VISIBLE.value){
+                        targetLink.visibility = VISIBILITY.VISIBLE
+                    }
+                    if(targetLink.data.target == targetNode.data.id && nodes.get(targetLink.data.source).visibility.value == VISIBILITY.VISIBLE.value){
+                        targetLink.visibility = VISIBILITY.VISIBLE
+                    }
+                })
+            }
+            if (link.data.source == node.data.id && nodes.get(link.data.target).visibility.value == VISIBILITY.VISIBLE.value) {
+                link.visibility = VISIBILITY.VISIBLE
+            }
+            if (link.data.target == node.data.id && nodes.get(link.data.source).visibility.value == VISIBILITY.VISIBLE.value) {
+                link.visibility = VISIBILITY.VISIBLE
+            }
+        })
+
         this.setState({
             nodes: nodes,
+            links: links,
             dialogSearchNodeOpen: false
         }, () => {
             this.saveView()
@@ -228,13 +274,6 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
             links: links
         }, () => {
             this.saveView()
-        })
-    }
-
-
-    handleCloseDialogEditNode = () => {
-        this.setState({
-            dialogEditNodeOpen: false
         })
     }
 
@@ -404,21 +443,6 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         return counter
     }
 
-
-    handleFilterWindowRequest(element: GraphNodeElement) {
-        this.setState({
-            filterWindowOpen: true,
-            filterWindowNode: element
-        })
-    }
-
-    handleRequestCloseFilterWindow() {
-        this.setState({
-            filterWindowOpen: false,
-            filterWindowNode: null
-        })
-    }
-
     handleExpandLink(linkId: string) {
         let links = this.state.links
         let nodes = this.state.nodes
@@ -496,15 +520,15 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         (element.childNodes[0] as any).style.width = 'auto'
     }
 
-    showNodeContextDesktopMenu(node: any) {
-        this.state.tappedNode = node.data()
-        this.state.tappedPosition = node.position()
+    showNodeContextDesktopMenu(node: GraphNodeElement) {
+        this.state.tappedNode = node.data
+        this.state.tappedPosition = node.position
 
         this.hideCoreMenu()
         this.showNodeMenu();
         let element = document.getElementById('nodeContextDesktopMenu');
-        element.style.marginLeft = (node.position().x) + "px";
-        element.style.marginTop = (node.position().y) + "px";
+        element.style.marginLeft = (node.position.x) + "px";
+        element.style.marginTop = (node.position.y) + "px";
         element.style.zIndex = '99999';
         (element.childNodes[0] as any).style.width = 'auto';
     }
@@ -550,16 +574,16 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
 
 
     showCoreMenu = () => {
-        document.getElementById('coreContextDesktopMenu').style.display = 'inline-block';
+        this.state.coreContextMenuOpen = true
     }
     hideCoreMenu = () => {
-        document.getElementById('coreContextDesktopMenu').style.display = 'none';
+        this.state.coreContextMenuOpen = false
     }
     showNodeMenu = () => {
-        document.getElementById('nodeContextDesktopMenu').style.display = 'inline-block';
+        this.state.nodeContextMenuOpen = true
     }
     hideNodeMenu = () => {
-        document.getElementById('nodeContextDesktopMenu').style.display = 'none';
+        this.state.nodeContextMenuOpen = false
     }
 
     handleNewNodeRequested = (type: GraphNodeType) => {
@@ -602,9 +626,12 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
                 link.visibility = VISIBILITY.GROUPED
                 link.linkClasses.splice(indexOfClass, 1)
 
-                let targetNode = nodes.get(link.data.target)
-                targetNode.visibility = VISIBILITY.GROUPED
-                nodes.set(targetNode.data.id, targetNode)
+
+                if(this.getNumberOfLinksForNode(link.data.target) == 0){
+                    let targetNode = nodes.get(link.data.target)
+                    targetNode.visibility = VISIBILITY.GROUPED
+                    nodes.set(targetNode.data.id, targetNode)
+                }
 
                 let sourceNode = nodes.get(link.data.source)
                 sourceNode.nodeClasses.push('parent')
@@ -715,12 +742,22 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         })
 
         let links: GraphLinkElement[] = []
-        this.state.links.forEach((link) => {
-            if (link.visibility.value == VISIBILITY.VISIBLE.value) {
-                link.data.label = this.props.nodeInformationProvider.getLinkLabel(link.data.target)
-                links.push(link)
-            }
-        })
+
+        if(this.state.showLabels) {
+            this.state.links.forEach((link) => {
+                if (link.visibility.value == VISIBILITY.VISIBLE.value) {
+                    link.data.label = this.props.nodeInformationProvider.getLinkLabel(link.data.source, link.data.id)
+                    links.push(link)
+                }
+            })
+        }else{
+            this.state.links.forEach((link) => {
+                if (link.visibility.value == VISIBILITY.VISIBLE.value) {
+                    link.data.label = ""
+                    links.push(link)
+                }
+            })
+        }
 
 
         return (
@@ -735,7 +772,6 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
                                     onNewNode={this.onNodeCreated.bind(this)}
                                     onNewLink={this.onLinkCreated.bind(this)}
                                     onNodePositionUpdate={this.onNodePositionUpdated.bind(this)}
-                                    onFilterWindowRequested={this.handleFilterWindowRequest.bind(this)}
                                     onCoreDesktopMenuRequested={this.showCoreContextDesktopMenu.bind(this)}
                                     onNodeDesktopMenuRequested={this.showNodeContextDesktopMenu.bind(this)}
                                     onLinkSelected={this.onLinkSelected.bind(this)}
@@ -744,57 +780,6 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
                                         this.handleNodeDetailRequested()
                                     }}
                                 />
-                                <Paper id="coreContextDesktopMenu" style={style}>
-                                    <Menu>
-                                        <MenuItem primaryText={"Add existing Node"} onTouchTap={()=>{
-                                            this.hideCoreMenu()
-                                            this.handleOpenDialogSearchNodeDesktop()
-                                        }}/>
-                                        {(() => {
-                                            let returnList: any[] = []
-                                            this.props.nodeTypes.forEach((nodeType) => {
-                                                returnList.push(<MenuItem
-                                                    primaryText={"Add new " + nodeType.name + " Node"}
-                                                    onTouchTap={() => this.handleNewNodeRequested(nodeType)}/>)
-                                            })
-                                            return returnList
-                                        })()}
-                                    </Menu>
-                                </Paper>
-
-                                <Paper id="nodeContextDesktopMenu" style={style}>
-                                    <Menu>
-                                        <MenuItem primaryText="Edit Node" onTouchTap={() => {
-                                            this.hideNodeMenu()
-                                            this.handleNodeDetailRequested()
-                                        }}/>
-                                        <MenuItem primaryText="Hide Node" onTouchTap={() => {
-                                            this.hideNodeMenu()
-                                            this.handleNodeCollapseDesktop()
-                                        }}/>
-                                        <MenuItem primaryText="Remove Node from View" onTouchTap={()=>{
-                                            this.hideNodeMenu()
-                                            this.handleDeleteNodeDesktop()
-                                        }}/>
-                                        <MenuItem primaryText="Collapse All" onTouchTap={() => {
-                                            this.hideNodeMenu()
-                                            this.handleCollapseAll()
-                                        }}/>
-                                        <MenuItem primaryText="Link to existing Node" onTouchTap={()=>{
-                                            this.hideNodeMenu()
-                                            this.handleOpenDialogSearchNodeToConnectDesktop()
-                                        }}/>
-                                        {(() => {
-                                            let returnList: any[] = []
-                                            this.props.nodeTypes.forEach((nodeType) => {
-                                                returnList.push(<MenuItem
-                                                    primaryText={"Link to new " + nodeType.name + " Node"}
-                                                    onTouchTap={() => this.handleNewNodeRequestedToConnect(nodeType)}/>)
-                                            })
-                                            return returnList
-                                        })()}
-                                    </Menu>
-                                </Paper>
                             </div>
                         )
                     } else {
@@ -807,9 +792,57 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
                                 onNewNode={this.onNodeCreated.bind(this)}
                                 onNewLink={this.onLinkCreated.bind(this)}
                                 onNodePositionUpdate={this.onNodePositionUpdated.bind(this)}
-                                onFilterWindowRequested={this.handleFilterWindowRequest.bind(this)}
                                 onLinkSelected={this.onLinkSelected.bind(this)}
                             />)
+                    }
+                })()}
+
+
+
+                {(() =>{
+                    if(this.state.coreContextMenuOpen){
+                        let nodes:GraphNodeData[] = []
+
+                        this.state.nodes.forEach((node) =>{
+                            nodes.push(node.data)
+                        })
+
+                        return(
+                            <CoreContextMenu
+                                nodes={nodes}
+                                position={this.state.tappedPosition}
+                                graphNodeTypes={this.props.nodeTypes}
+                                requestClose={this.hideCoreMenu.bind(this)}
+                                timestamp={TimeService.getTimestamp()}
+                            />
+                        )
+                    }
+                })()}
+
+                {(() =>{
+                    if(this.state.nodeContextMenuOpen){
+                        let nodes:GraphNodeData[] = []
+                        let links:GraphLinkData[] = []
+
+                        this.state.nodes.forEach((node) =>{
+                            nodes.push(node.data)
+                        })
+                        this.state.links.forEach((links) =>{
+                            nodes.push(links.data)
+                        })
+
+                        return(
+                            <NodeContextMenu
+                                nodes={nodes}
+                                links={links}
+                                position={this.state.tappedPosition}
+                                graphNodeTypes={this.props.nodeTypes}
+                                requestClose={this.hideCoreMenu.bind(this)}
+                                timestamp={TimeService.getTimestamp()}
+                                onExpandAll={() => console.log('Expand All')}
+                                onExpandNode={() => console.log('Expand Node')}
+                            />
+                        )
                     }
                 })()}
 
@@ -852,28 +885,6 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
                     }
                 })()}
 
-                {(() => {
-                    if (this.state.filterWindowOpen) {
-                        let collapsedLinks = this.getListOfAllCollapsedLinks(this.state.filterWindowNode.data.id)
-                        if (collapsedLinks.length > 0) {
-                            return (<div>
-                                <ExpandDialog
-                                    onExpandAll={this.handleExpandAll.bind(this)}
-                                    onExpandNode={this.handleExpandLink.bind(this)}
-                                    timestamp={TimeService.getTimestamp()}
-                                    position={new GraphPosition(
-                                    this.state.filterWindowNode.position.x,
-                                    this.state.filterWindowNode.position.y
-                                )}
-                                    list={collapsedLinks}
-                                    requestClose={this.handleRequestCloseFilterWindow.bind(this)}
-                                />
-                            </div>)
-                        } else {
-                            this.state.filterWindowOpen = false
-                        }
-                    }
-                })()}
                 <div id="toolbar">
                     {(() => {
                         if (this.state.collapseToolbarNeeded) {
