@@ -11,6 +11,8 @@ import getMuiTheme = __MaterialUI.Styles.getMuiTheme;
 import {Menu} from "material-ui";
 import {MenuItem} from "material-ui";
 import {GraphNodeData} from "../../model/GraphNodeData";
+import GraphNodeSearch from "../GraphSearchFields/GraphNodeSearch";
+import {TimeService} from "../../common/TimeService";
 
 export interface CoreContextMenuProps {
     nodes: GraphNodeData[]
@@ -63,15 +65,15 @@ export default class CoreContextMenu extends React.Component<CoreContextMenuProp
             iconHover: {
                 color: "#4591bc"
             },
-            listItem: {
-                marginLeft: "-72px"
-            },
             underlineStyle: {
                 borderColor: "#4591bc",
             },
             position: {
-                left: this.props.position.x + 60,
-                top: this.props.position.y - 30
+                left: this.props.position.x,
+                top: this.props.position.y
+            },
+            contextMenuItem:{
+                height: "44px"
             }
         }
 
@@ -84,41 +86,23 @@ export default class CoreContextMenu extends React.Component<CoreContextMenuProp
         };
 
         return (
-                <div>
-                    <Paper id="coreContextMenu" style={styles.position}>
-                        <List>
-                            <ListItem primaryText = "Menu" children={
-                            <Menu>
-                                <MenuItem primaryText="Edit Node" onTouchTap={() => {
-                                        console.log('Edit Node')
-                                        }}/>
-                                <MenuItem primaryText="Hide Node" onTouchTap={() => {
-                                        console.log('Hide Node')
-                                        }}/>
-                                <MenuItem primaryText="Remove Node from View" onTouchTap={()=>{
-                                        console.log('Remove Node')
-                                        }}/>
-                                <MenuItem primaryText="Collapse All" onTouchTap={() => {
-                                        console.log('Collapse All')
-                                        }}/>
-                                <MenuItem primaryText="Link to existing Node" onTouchTap={()=>{
-                                        console.log('Edit Node')
-                                        }}/>
-                                {(() => {
-                                    let returnList: any[] = []
-                                    this.props.graphNodeTypes.forEach((nodeType) => {
-                                        returnList.push(<MenuItem
-                                            primaryText={"Link to new " + nodeType.name + " Node"}
-                                            onTouchTap={() =>
-                                        console.log('Edit Node')}/>)
+            <div>
+                <Paper id="coreContextMenu" style={styles.position}>
+                    <List>
+                        <ListItem primaryText="Add new" style={styles.contextMenuItem}
+                                  nestedItems={
+                                      this.props.graphNodeTypes.map((type) => {
+                                        return <ListItem
+                                            primaryText={type.name + " Node"}
+                                            onTouchTap={() => console.log(type.name + " Node")}
+                                        ></ListItem>
                                     })
-                                    return returnList
-                                })()}
-                            </Menu>
-                        }/>
-                        </List>
-                    </Paper>
-                </div>
+                                  }/>
+                        <GraphNodeSearch nodes ={this.props.nodes} onSelectNode={()=>console.log('node selected')} timestamp={TimeService.getTimestamp()}></GraphNodeSearch>
+
+                    </List>
+                </Paper>
+            </div>
         )
     }
 }

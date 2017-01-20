@@ -19,7 +19,7 @@ export interface GraphNodeSearchState {
     active?: boolean
 }
 
-export default class ExpandDialog extends React.Component<GraphNodeSearchProps,GraphNodeSearchState> {
+export default class GraphNodeSearch extends React.Component<GraphNodeSearchProps,GraphNodeSearchState> {
     constructor(props: any) {
         super(props);
         this.state = {
