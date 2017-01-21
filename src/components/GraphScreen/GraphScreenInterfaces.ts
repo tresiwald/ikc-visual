@@ -6,6 +6,7 @@ import {GraphLinkElement} from "../../model/GraphLinkData";
 import {DialogFactory} from "../../interfaces/DialogFactory";
 import {GraphPosition} from "../../model/GraphPosition";
 import {GraphNodeType} from "../../model/GraphNodeType";
+import {SearchFieldFactory} from "../../interfaces/SearchFieldFactory";
 
 export interface  GraphScreenProps {
     viewToLoad: View;
@@ -15,6 +16,7 @@ export interface  GraphScreenProps {
     operationService: OperationService;
     timestamp: string;
     dialogFactory: DialogFactory;
+    searchFieldFactory: SearchFieldFactory;
     onNodeDetailRequest: Function;
     nodeTypes?: GraphNodeType[]
 }

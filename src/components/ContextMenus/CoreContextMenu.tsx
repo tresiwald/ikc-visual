@@ -13,6 +13,7 @@ import {MenuItem} from "material-ui";
 import {GraphNodeData} from "../../model/GraphNodeData";
 import GraphNodeSearch from "../GraphSearchFields/GraphNodeSearch";
 import {TimeService} from "../../common/TimeService";
+import {SearchFieldFactory} from "../../interfaces/SearchFieldFactory";
 
 export interface CoreContextMenuProps {
     nodes: GraphNodeData[]
@@ -20,6 +21,7 @@ export interface CoreContextMenuProps {
     requestClose: Function,
     position: GraphPosition,
     graphNodeTypes: GraphNodeType[],
+    searchFieldFactory: SearchFieldFactory;
 }
 export interface CoreContextMenuState {
     timestamp?: string
@@ -98,7 +100,9 @@ export default class CoreContextMenu extends React.Component<CoreContextMenuProp
                                         ></ListItem>
                                     })
                                   }/>
-                        <GraphNodeSearch nodes ={this.props.nodes} onSelectNode={()=>console.log('node selected')} timestamp={TimeService.getTimestamp()}></GraphNodeSearch>
+                        {(() => {
+                            return this.props.searchFieldFactory.getNodeSearchField( () => console.log('select node'))
+                        })()}
 
                     </List>
                 </Paper>
