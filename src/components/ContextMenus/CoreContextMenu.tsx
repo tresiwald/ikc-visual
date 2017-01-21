@@ -68,9 +68,9 @@ export default class CoreContextMenu extends React.Component<CoreContextMenuProp
             underlineStyle: {
                 borderColor: "#4591bc",
             },
-            position: {
+            coreContextMenu: {
                 left: this.props.position.x,
-                top: this.props.position.y
+                top: this.props.position.y,
             },
             contextMenuItem:{
                 height: "44px"
@@ -87,7 +87,7 @@ export default class CoreContextMenu extends React.Component<CoreContextMenuProp
 
         return (
             <div>
-                <Paper id="coreContextMenu" style={styles.position}>
+                <Paper id="coreContextMenu" style={styles.coreContextMenu}>
                     <List>
                         <ListItem primaryText="Add new" style={styles.contextMenuItem}
                                   nestedItems={

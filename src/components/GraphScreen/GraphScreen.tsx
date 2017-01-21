@@ -31,15 +31,15 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         if (!this.isMobile.any()) {
             document.addEventListener('click', function (e: any) {
                 let elementMouseIsOver = document.elementFromPoint(e.clientX, e.clientY);
-                if (that.isDescendant(document.getElementById('coreContextDesktopMenu'), elementMouseIsOver)) {
+                if (that.isDescendant(document.getElementById('coreContextMenu'), elementMouseIsOver)) {
                     console.log(elementMouseIsOver)
                 } else {
-                    document.getElementById('coreContextDesktopMenu').style.display = 'none'
+                    that.hideCoreMenu()
                 }
-                if (that.isDescendant(document.getElementById('nodeContextDesktopMenu'), elementMouseIsOver)) {
+                if (that.isDescendant(document.getElementById('nodeContextMenu'), elementMouseIsOver)) {
                     console.log(elementMouseIsOver)
                 } else {
-                    document.getElementById('nodeContextDesktopMenu').style.display = 'none'
+                    that.hideNodeMenu()
                 }
 
             })
@@ -512,12 +512,6 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
 
         this.hideNodeMenu()
         this.showCoreMenu()
-
-        let element = document.getElementById('coreContextDesktopMenu');
-        element.style.marginLeft = (position.x ) + "px";
-        element.style.marginTop = (position.y) + "px";
-        element.style.zIndex = '99999';
-        (element.childNodes[0] as any).style.width = 'auto'
     }
 
     showNodeContextDesktopMenu(node: GraphNodeElement) {
@@ -526,11 +520,6 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
 
         this.hideCoreMenu()
         this.showNodeMenu();
-        let element = document.getElementById('nodeContextDesktopMenu');
-        element.style.marginLeft = (node.position.x) + "px";
-        element.style.marginTop = (node.position.y) + "px";
-        element.style.zIndex = '99999';
-        (element.childNodes[0] as any).style.width = 'auto';
     }
 
     isMobile = {
@@ -574,16 +563,24 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
 
 
     showCoreMenu = () => {
-        this.state.coreContextMenuOpen = true
+        this.setState({
+            coreContextMenuOpen:true
+        })
     }
     hideCoreMenu = () => {
-        this.state.coreContextMenuOpen = false
+        this.setState({
+            coreContextMenuOpen:false
+        })
     }
     showNodeMenu = () => {
-        this.state.nodeContextMenuOpen = true
+        this.setState({
+            nodeContextMenuOpen:true
+        })
     }
     hideNodeMenu = () => {
-        this.state.nodeContextMenuOpen = false
+        this.setState({
+            nodeContextMenuOpen:false
+        })
     }
 
     handleNewNodeRequested = (type: GraphNodeType) => {
@@ -804,6 +801,7 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
                         let nodes:GraphNodeData[] = []
 
                         this.state.nodes.forEach((node) =>{
+                            node.data.label = this.props.nodeInformationProvider.getNodeTitle(node.data.id)
                             nodes.push(node.data)
                         })
 
@@ -825,10 +823,12 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
                         let links:GraphLinkData[] = []
 
                         this.state.nodes.forEach((node) =>{
+                            node.data.label = this.props.nodeInformationProvider.getNodeTitle(node.data.id)
                             nodes.push(node.data)
                         })
-                        this.state.links.forEach((links) =>{
-                            nodes.push(links.data)
+                        this.state.links.forEach((link) =>{
+                            link.data.label = this.props.nodeInformationProvider.getLinkLabel(link.data.target, link.data.id)
+                            links.push(link.data)
                         })
 
                         return(

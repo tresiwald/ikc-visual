@@ -175,11 +175,11 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
         });
 
         /*this.cy.on('tap', 'node.parent', function (evt: any) {
-            let node = evt.cyTarget;
-            let position = new GraphPosition(node.position().x + that.state.pan.x ,node.position().y + that.state.pan.y)
-            that.props.onFilterWindowRequested(GraphElementFactory.getNode(node.data(),node.position(), VISIBILITY.VISIBLE))
+         let node = evt.cyTarget;
+         let position = new GraphPosition(node.position().x + that.state.pan.x ,node.position().y + that.state.pan.y)
+         that.props.onFilterWindowRequested(GraphElementFactory.getNode(node.data(),node.position(), VISIBILITY.VISIBLE))
 
-        });*/
+         });*/
 
         // add contextmenu
         if(this.props.nodeMenu && this.props.coreMenu) {
