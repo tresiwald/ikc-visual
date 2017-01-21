@@ -33,6 +33,7 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
     renderCytoscapeElement() {
         let that = this
 
+
         if(this.cy){
             this.cy.nodes().remove()
             this.cy.edges().remove()
@@ -101,7 +102,6 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
             });
         }
 
-
         this.cy.nodes().forEach((node:any)=> {
             let inputNode = that.props.nodes.filter((n) => n.data.id == node.id())[0]
             if (inputNode.nodeClasses.length) {
@@ -147,12 +147,23 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
                 let clone = GraphElementFactory.getNode(e.cyTarget.data(), new GraphPosition(e.cyTarget.position().x  + that.state.pan.x, e.cyTarget.position().y + that.state.pan.y),VISIBILITY.VISIBLE)
                 that.props.onNodeDesktopMenuRequested(clone)
             })
+            this.cy.nodes().on('taphold',function (e:any){
+                let clone = GraphElementFactory.getNode(e.cyTarget.data(), new GraphPosition(e.cyTarget.position().x  + that.state.pan.x, e.cyTarget.position().y + that.state.pan.y),VISIBILITY.VISIBLE)
+                that.props.onNodeDesktopMenuRequested(clone)
+            })
             this.cy.on('cxttap',function (e:any){
                 if(!e.cyTarget.id) {
                     let position  = new GraphPosition(e.cyPosition.x + that.state.pan.x, e.cyPosition.y + that.state.pan.y)
                     that.props.onCoreDesktopMenuRequested(position)
                 }
             })
+            this.cy.on('taphold',function (e:any){
+                if(!e.cyTarget.id) {
+                    let position  = new GraphPosition(e.cyPosition.x + that.state.pan.x, e.cyPosition.y + that.state.pan.y)
+                    that.props.onCoreDesktopMenuRequested(position)
+                }
+            })
+
         }
 
         // setup drag and drop to connect to nodes

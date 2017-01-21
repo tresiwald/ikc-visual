@@ -102,6 +102,9 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
                 link.visibility = VISIBILITY.VISIBLE
 
                 let targetNode = nodes.get(link.data.target)
+                if(targetNode.position.x == 0 && targetNode.position.y == 0){
+                    targetNode.position = this.calcNodePosition(newNode.position)
+                }
                 targetNode.visibility = VISIBILITY.VISIBLE
                 nodes.set(targetNode.data.id, targetNode)
 
@@ -207,6 +210,8 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         let links = this.state.links
 
         let node = nodes.get(nodeId)
+        node.visibility = VISIBILITY.VISIBLE
+        node.position = this.state.tappedPosition
         nodes.set(node.data.id, node)
 
         links.forEach((link) => {
@@ -215,6 +220,11 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
 
                 let targetNode = nodes.get(link.data.target)
                 targetNode.visibility = VISIBILITY.VISIBLE
+
+                if(targetNode.position.x == 0 && targetNode.position.y == 0){
+                    targetNode.position = this.calcNodePosition(node.position)
+                }
+
                 nodes.set(targetNode.data.id, targetNode)
 
                 links.forEach((targetLink) => {
@@ -504,6 +514,9 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         links.set(linkToExpand.data.id, linkToExpand)
 
         let targetNode = nodes.get(linkToExpand.data.target)
+        if(targetNode.position.x == 0 && targetNode.position.y == 0){
+            targetNode.position = this.calcNodePosition(this.state.tappedPosition)
+        }
         targetNode.visibility = VISIBILITY.VISIBLE
         nodes.set(targetNode.data.id, targetNode)
 
@@ -526,6 +539,9 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
 
                 let node = nodes.get(link.data.target)
                 node.visibility = VISIBILITY.VISIBLE
+                if(node.position.x == 0 && node.position.y == 0){
+                    node.position = this.calcNodePosition(this.state.tappedPosition)
+                }
                 nodes.set(node.data.id, node)
             }
         })
@@ -696,9 +712,12 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
             if (link.visibility == VISIBILITY.VISIBLE && link.data.source == this.state.tappedNode.id) {
                 link.visibility = VISIBILITY.HIDDEN
 
-                let targetNode = nodes.get(link.data.target)
-                targetNode.visibility = VISIBILITY.HIDDEN
-                nodes.set(targetNode.data.id, targetNode)
+                if(this.getNumberOfLinksForNode(link.data.target) == 0){
+                    let targetNode = nodes.get(link.data.target)
+                    targetNode.visibility = VISIBILITY.HIDDEN
+                    nodes.set(targetNode.data.id, targetNode)
+
+                }
             }
         })
 
@@ -721,6 +740,17 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
             showLabels: true
         })
     }
+
+    calcNodePosition(source: GraphPosition): GraphPosition{
+        let randomAngle = Math.random() * 180
+        let randomRadius = Math.random() * 40
+
+        return new GraphPosition(
+            Math.round(source.x + ((80 + randomRadius) * Math.cos((Math.PI / 180) *  randomAngle))),
+            Math.round(source.y + ((80 + randomRadius) * Math.sin((Math.PI / 180) *  randomAngle)))
+        )
+    }
+
     render() {
         this.initState()
         let that = this
@@ -731,45 +761,6 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
             position: 'absolute',
             transition: 'none'
         };
-
-        let coreMenu = new ContextMenu(
-            "core",
-            [
-                new ContextMenuCommand(
-                    "Add New Node",
-                    that.handleOpenDialogNewNode.bind(that)
-                ),
-                new ContextMenuCommand(
-                    "Add existing Node",
-                    that.handleOpenDialogSearchNode.bind(that)
-                ),
-            ]
-        )
-        let nodeMenu = new ContextMenu(
-            "node",
-            [
-                new ContextMenuCommand(
-                    "Hide Node",
-                    that.handleNodeCollapseMobile.bind(that)
-                ),
-                new ContextMenuCommand(
-                    "Remove Node",
-                    that.handleDeleteNodeMobile.bind(that)
-                ),
-                new ContextMenuCommand(
-                    "Edit Node",
-                    that.handleOpenDialogEditNode.bind(that)
-                ),
-                new ContextMenuCommand(
-                    "Link to new Node",
-                    that.handleOpenDialogNewNodeToConnect.bind(that)
-                ),
-                new ContextMenuCommand(
-                    "Link to existing Node",
-                    that.handleOpenDialogSearchNodeToConnect.bind(that)
-                ),
-            ]
-        )
 
         let nodes: GraphNodeElement[] = []
         this.state.nodes.forEach((node) => {
@@ -800,40 +791,22 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
 
         return (
             <div>
-                {(() => {
-                    if (!this.isMobile.any()) {
-                        return (
-                            <div>
-                                <Graph
-                                    nodes={nodes}
-                                    links={links}
-                                    onNewNode={this.onNodeCreated.bind(this)}
-                                    onNewLink={this.onLinkCreated.bind(this)}
-                                    onNodePositionUpdate={this.onNodePositionUpdated.bind(this)}
-                                    onCoreDesktopMenuRequested={this.showCoreContextDesktopMenu.bind(this)}
-                                    onNodeDesktopMenuRequested={this.showNodeContextDesktopMenu.bind(this)}
-                                    onLinkSelected={this.onLinkSelected.bind(this)}
-                                    onNodeDetailRequest={(node:GraphNodeData)=>{
+                <div>
+                    <Graph
+                        nodes={nodes}
+                        links={links}
+                        onNewNode={this.onNodeCreated.bind(this)}
+                        onNewLink={this.onLinkCreated.bind(this)}
+                        onNodePositionUpdate={this.onNodePositionUpdated.bind(this)}
+                        onCoreDesktopMenuRequested={this.showCoreContextDesktopMenu.bind(this)}
+                        onNodeDesktopMenuRequested={this.showNodeContextDesktopMenu.bind(this)}
+                        onLinkSelected={this.onLinkSelected.bind(this)}
+                        onNodeDetailRequest={(node:GraphNodeData)=>{
                                         this.state.tappedNode = node
                                         this.handleNodeDetailRequested()
                                     }}
-                                />
-                            </div>
-                        )
-                    } else {
-                        return (
-                            <Graph
-                                nodes={nodes}
-                                links={links}
-                                coreMenu={coreMenu}
-                                nodeMenu={nodeMenu}
-                                onNewNode={this.onNodeCreated.bind(this)}
-                                onNewLink={this.onLinkCreated.bind(this)}
-                                onNodePositionUpdate={this.onNodePositionUpdated.bind(this)}
-                                onLinkSelected={this.onLinkSelected.bind(this)}
-                            />)
-                    }
-                })()}
+                    />
+                </div>
 
 
 
