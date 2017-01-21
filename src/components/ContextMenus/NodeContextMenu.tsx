@@ -20,6 +20,11 @@ export interface NodeContextMenuProps {
     focus?: boolean,
     onExpandNode: Function,
     onExpandAll: Function,
+    onCollapseAll: Function,
+    onNewNodeToConnect: Function,
+    onExistingNodeToConnect: Function,
+    onEditNode: Function,
+    onHideNode: Function,
     requestClose: Function,
     position: GraphPosition,
     graphNodeTypes: GraphNodeType[]
@@ -59,12 +64,32 @@ export default class NodeContextMenu extends React.Component<NodeContextMenuProp
     }
 
 
-    handleExpandNode = (result: GraphLinkData) => {
-        this.props.onExpandNode(result.id)
+    handleExpandNode = (resultId:string) => {
+        this.props.onExpandNode(resultId)
     }
 
     handleExpandAll = () => {
-        //this.props.onExpandAll(this.props.list[0].source)
+        this.props.onExpandAll()
+    }
+
+    handleCollapseAll = () => {
+        this.props.onCollapseAll()
+    }
+
+    handleNewNodeToConnect = (type:GraphNodeType) => {
+        this.props.onNewNodeToConnect(type)
+    }
+
+    handleExistingNodeToConnect = () => {
+        this.props.onExistingNodeToConnect()
+    }
+
+    handleEditNode = () => {
+        this.props.onEditNode()
+    }
+
+    handleHideNode = () => {
+        this.props.onHideNode()
     }
 
     onRequestClose = () =>{
@@ -101,12 +126,8 @@ export default class NodeContextMenu extends React.Component<NodeContextMenuProp
             <div>
                 <Paper id="nodeContextMenu" style={styles.nodeContextMenu}>
                     <List>
-                        <ListItem primaryText="Edit Node" onTouchTap={() => {
-                                            console.log('Edit Node')
-                                            }}/>
-                        <ListItem primaryText="Hide Node" onTouchTap={() => {
-                                            console.log('Hide Node')
-                                            }}/>
+                        <ListItem primaryText="Edit Node" onTouchTap={this.handleEditNode.bind(this)}/>
+                        <ListItem primaryText="Hide Node" onTouchTap={this.handleHideNode.bind(this)}/>
                         <ListItem primaryText="Link to" style={styles.contextMenuItem}
                                   nestedItems={
                                           (()=> {
@@ -114,27 +135,26 @@ export default class NodeContextMenu extends React.Component<NodeContextMenuProp
 
                                               returnList.push(<ListItem
                                                     primaryText={'Existing Node'}
-                                                    onTouchTap={() => console.log("Existing Node")}
+                                                     onTouchTap={this.handleExistingNodeToConnect.bind(this)}
                                                 ></ListItem>)
 
                                               this.props.graphNodeTypes.forEach((type) => {
                                                 returnList.push(<ListItem
                                                     primaryText={'New ' + type.name + " Node"}
-                                                    onTouchTap={() => console.log(type.name + " Node")}
+                                                    onTouchTap={() => this.handleNewNodeToConnect(type)}
                                                 ></ListItem>)
                                               })
                                               return returnList
                                           })()
 
                                   }/>
-                        <ListItem primaryText="Collapse All Links" onTouchTap={() => {
-                                            console.log('Collapse All Links')
-                                            }}/>
-                        <ListItem primaryText="Expand All Links" onTouchTap={() => {
-                                            console.log('Expand All Links')
-                                            }}/>
+                        <ListItem primaryText="Collapse All Links" onTouchTap={this.handleCollapseAll.bind(this)}/>
+                        <ListItem primaryText="Expand All Links" onTouchTap={this.handleExpandAll.bind(this)}/>
                         {(() => {
-                            return this.props.searchFieldFactory.getLinkSearchField( () => console.log('select link'))
+                            if(this.props.links.length > 0) {
+                                let links = this.props.links.map((link) => link.id)
+                                return this.props.searchFieldFactory.getLinkSearchField(this.handleExpandNode.bind(this), links)
+                            }
                         })()}
                     </List>
                 </Paper>

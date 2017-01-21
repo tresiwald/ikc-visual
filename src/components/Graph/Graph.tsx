@@ -33,61 +33,74 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
     renderCytoscapeElement() {
         let that = this
 
-        // init basic context
-        this.cy = (window as any).cy = cytoscape({
-            container: document.getElementById('ikc-visual'),
+        if(this.cy){
+            this.cy.nodes().remove()
+            this.cy.edges().remove()
 
-            pan: this.state.pan,
+            this.props.nodes.forEach((node) => {
+                this.cy.add(node)
+            })
+            this.props.links.forEach((link) => {
+                this.cy.add(link)
+            })
+        }else{
+            // init basic context
+            this.cy = (window as any).cy = cytoscape({
+                container: document.getElementById('ikc-visual'),
 
-            layout: {
-                name: 'preset',
-                fit: false,
-                pan: 2,
-            },
+                pan: this.state.pan,
 
-            style: [
-                {
-                    selector: 'node',
-                    style: {
-                        'content': 'data(label)',
-                        'text-opacity': 0.8,
-                        'text-valign': 'center',
-                        'text-halign': 'right',
-                        'background-color': '#11479e'
-                    }
-                }, {
-                    selector: 'edge',
-                    style: {
-                        'width': 1,
-                        'label': 'data(label)',
-                        'target-arrow-shape': 'triangle',
-                        'line-color': '#9dbaea',
-                        'target-arrow-color': '#9dbaea',
-                        'curve-style': 'bezier',
-                        'control-point-step-size': 5,
-                        'edge-text-rotation': 'autorotate'
-                    }
-                }, {
-                    selector: 'edge.selected',
-                    style: {
-                        'target-arrow-shape': 'triangle',
-                        'line-color': '#CC11AA',
-                        'target-arrow-color': '#CC11AA',
-                    }
-                }, {
-                    selector: 'node.parent',
-                    style: {
-                        'background-color': '#CC11AA',
-                    }
+                layout: {
+                    name: 'preset',
+                    fit: false,
+                    pan: 2,
                 },
-            ],
 
-            elements: {
-                nodes: that.props.nodes,
-                edges: that.props.links
-            },
+                style: [
+                    {
+                        selector: 'node',
+                        style: {
+                            'content': 'data(label)',
+                            'text-opacity': 0.8,
+                            'text-valign': 'center',
+                            'text-halign': 'right',
+                            'background-color': '#11479e'
+                        }
+                    }, {
+                        selector: 'edge',
+                        style: {
+                            'width': 1,
+                            'label': 'data(label)',
+                            'target-arrow-shape': 'triangle',
+                            'line-color': '#9dbaea',
+                            'target-arrow-color': '#9dbaea',
+                            'curve-style': 'bezier',
+                            'control-point-step-size': 5,
+                            'edge-text-rotation': 'autorotate'
+                        }
+                    }, {
+                        selector: 'edge.selected',
+                        style: {
+                            'target-arrow-shape': 'triangle',
+                            'line-color': '#CC11AA',
+                            'target-arrow-color': '#CC11AA',
+                        }
+                    }, {
+                        selector: 'node.parent',
+                        style: {
+                            'background-color': '#CC11AA',
+                        }
+                    },
+                ],
 
-        });
+                elements: {
+                    nodes: that.props.nodes,
+                    edges: that.props.links
+                },
+
+            });
+        }
+
 
         this.cy.nodes().forEach((node:any)=> {
             let inputNode = that.props.nodes.filter((n) => n.data.id == node.id())[0]

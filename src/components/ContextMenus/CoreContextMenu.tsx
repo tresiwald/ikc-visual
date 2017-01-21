@@ -22,6 +22,8 @@ export interface CoreContextMenuProps {
     position: GraphPosition,
     graphNodeTypes: GraphNodeType[],
     searchFieldFactory: SearchFieldFactory;
+    onNewNode: Function,
+    onExistingNode: Function,
 }
 export interface CoreContextMenuState {
     timestamp?: string
@@ -61,6 +63,14 @@ export default class CoreContextMenu extends React.Component<CoreContextMenuProp
         this.props.requestClose()
     }
 
+    handleNewNode = (type:GraphNodeType) => {
+        this.props.onNewNode(type)
+    }
+
+    handleExistingNode = (nodeId:string) => {
+        this.props.onExistingNode(nodeId)
+    }
+
     render() {
         this.initState();
         const styles = {
@@ -96,12 +106,12 @@ export default class CoreContextMenu extends React.Component<CoreContextMenuProp
                                       this.props.graphNodeTypes.map((type) => {
                                         return <ListItem
                                             primaryText={type.name + " Node"}
-                                            onTouchTap={() => console.log(type.name + " Node")}
+                                            onTouchTap={() => this.handleNewNode(type)}
                                         ></ListItem>
                                     })
                                   }/>
                         {(() => {
-                            return this.props.searchFieldFactory.getNodeSearchField( () => console.log('select node'))
+                            return this.props.searchFieldFactory.getNodeSearchField(this.handleExistingNode.bind(this))
                         })()}
 
                     </List>
