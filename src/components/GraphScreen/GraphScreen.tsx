@@ -812,6 +812,7 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
                                 graphNodeTypes={this.props.nodeTypes}
                                 requestClose={this.hideCoreMenu.bind(this)}
                                 timestamp={TimeService.getTimestamp()}
+                                searchFieldFactory={this.props.searchFieldFactory}
                             />
                         )
                     }
