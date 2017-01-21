@@ -828,8 +828,10 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
                             nodes.push(node.data)
                         })
                         this.state.links.forEach((link) =>{
-                            link.data.label = this.props.nodeInformationProvider.getLinkLabel(link.data.target, link.data.id)
-                            links.push(link.data)
+                            if(link.data.source == this.state.tappedNode.id) {
+                                link.data.label = this.props.nodeInformationProvider.getLinkLabel(link.data.source, link.data.id)
+                                links.push(link.data)
+                            }
                         })
 
                         return(
@@ -842,6 +844,7 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
                                 timestamp={TimeService.getTimestamp()}
                                 onExpandAll={() => console.log('Expand All')}
                                 onExpandNode={() => console.log('Expand Node')}
+                                searchFieldFactory={this.props.searchFieldFactory}
                             />
                         )
                     }

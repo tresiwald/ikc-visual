@@ -5,6 +5,7 @@ import {GraphLinkData} from "../../model/GraphLinkData";
 import MapsZoomOutMap from "material-ui/svg-icons/maps/zoom-out-map";
 import {GraphPosition} from "../../model/GraphPosition";
 import {GraphNodeType} from "../../model/GraphNodeType";
+import {SearchFieldFactory} from "../../interfaces/SearchFieldFactory";
 
 import render = __React.__DOM.render;
 import getMuiTheme = __MaterialUI.Styles.getMuiTheme;
@@ -22,6 +23,7 @@ export interface NodeContextMenuProps {
     requestClose: Function,
     position: GraphPosition,
     graphNodeTypes: GraphNodeType[]
+    searchFieldFactory: SearchFieldFactory;
 }
 export interface NodeContextMenuState {
     timestamp?: string,
@@ -75,15 +77,15 @@ export default class NodeContextMenu extends React.Component<NodeContextMenuProp
             iconHover: {
                 color: "#4591bc"
             },
-            listItem: {
-                marginLeft: "-72px"
-            },
             underlineStyle: {
                 borderColor: "#4591bc",
             },
-            position: {
-                left: this.props.position.x + 60,
-                top: this.props.position.y - 30
+            nodeContextMenu: {
+                left: this.props.position.x,
+                top: this.props.position.y,
+            },
+            contextMenuItem:{
+                height: "44px"
             }
         }
 
@@ -96,42 +98,47 @@ export default class NodeContextMenu extends React.Component<NodeContextMenuProp
         };
 
         return (
-                <div>
-                    <Paper id="nodeContextMenu" style={styles.position}>
-                        <List>
-                            <ListItem primaryText="Edit Node" onTouchTap={() => {
+            <div>
+                <Paper id="nodeContextMenu" style={styles.nodeContextMenu}>
+                    <List>
+                        <ListItem primaryText="Edit Node" onTouchTap={() => {
                                             console.log('Edit Node')
                                             }}/>
-                            <ListItem primaryText="Hide Node" onTouchTap={() => {
+                        <ListItem primaryText="Hide Node" onTouchTap={() => {
                                             console.log('Hide Node')
                                             }}/>
-                            <ListItem primaryText = "Links" children={
-                                <Menu>
-                                    <MenuItem primaryText="Collapse All" onTouchTap={() => {
-                                            console.log('Collapse All')
+                        <ListItem primaryText="Link to" style={styles.contextMenuItem}
+                                  nestedItems={
+                                          (()=> {
+                                              let returnList:any[] = []
+
+                                              returnList.push(<ListItem
+                                                    primaryText={'Existing Node'}
+                                                    onTouchTap={() => console.log("Existing Node")}
+                                                ></ListItem>)
+
+                                              this.props.graphNodeTypes.forEach((type) => {
+                                                returnList.push(<ListItem
+                                                    primaryText={'New ' + type.name + " Node"}
+                                                    onTouchTap={() => console.log(type.name + " Node")}
+                                                ></ListItem>)
+                                              })
+                                              return returnList
+                                          })()
+
+                                  }/>
+                        <ListItem primaryText="Collapse All Links" onTouchTap={() => {
+                                            console.log('Collapse All Links')
                                             }}/>
-                                    <MenuItem primaryText="Expand All" onTouchTap={() => {
-                                            console.log('Collapse All')
+                        <ListItem primaryText="Expand All Links" onTouchTap={() => {
+                                            console.log('Expand All Links')
                                             }}/>
-                                    <MenuItem primaryText="Link to existing Node" onTouchTap={()=>{
-                                            console.log('Edit Node')
-                                            }}/>
-                                    {(() => {
-                                        let returnList: any[] = []
-                                        this.props.graphNodeTypes.forEach((nodeType) => {
-                                            returnList.push(<MenuItem
-                                                primaryText={"Link to new " + nodeType.name + " Node"}
-                                                onTouchTap={() =>
-                                            console.log('Edit Node')}/>)
-                                        })
-                                        return returnList
-                                    })()}
-                                </Menu>
-                            }/>
-                        </List>
-                        <FlatButton label="Expand All" onTouchTap={this.handleExpandAll}/>
-                    </Paper>
-                </div>
+                        {(() => {
+                            return this.props.searchFieldFactory.getLinkSearchField( () => console.log('select link'))
+                        })()}
+                    </List>
+                </Paper>
+            </div>
         )
     }
 }
