@@ -9,6 +9,5 @@ export class VISIBILITY {
 
     // values
     static VISIBLE = new VISIBILITY("VISIBLE");
-    static GROUPED = new VISIBILITY("GROUPED");
     static HIDDEN = new VISIBILITY("HIDDEN");
 }

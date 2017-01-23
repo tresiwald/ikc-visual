@@ -2,11 +2,9 @@ import * as React from "react";
 import {GraphProps, GraphState} from "./GraphInterfaces";
 import {GraphElementFactory} from "../../model/GraphElementFactory";
 import {GraphPosition} from "../../model/GraphPosition";
-import {GraphLinkData} from "../../model/GraphLinkData";
 import {VISIBILITY} from "../../model/VISIBILITY";
 import getMuiTheme = __MaterialUI.Styles.getMuiTheme;
-import {TimeService} from "../../common/TimeService";
-import {FlatButton} from "material-ui";
+import {DOMHelperService} from "../../common/DOMHelperService";
 
 let cytoscape = require('cytoscape');
 let cytoscapeCtxmenu = require('cytoscape-cxtmenu');
@@ -34,7 +32,7 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
         let that = this
 
 
-        if(this.cy){
+        if (this.cy) {
             this.cy.nodes().remove()
             this.cy.edges().remove()
 
@@ -44,7 +42,7 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
             this.props.links.forEach((link) => {
                 this.cy.add(link)
             })
-        }else{
+        } else {
             // init basic context
             this.cy = (window as any).cy = cytoscape({
                 container: document.getElementById('ikc-visual'),
@@ -100,72 +98,32 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
                 },
 
             });
+
+            // save position on tap
+            this.cy.on('taphold', function (e: any) {
+                that.cy.position = e.cyPosition
+            })
+
+            // save pan context
+            this.cy.on('pan', function (e: any) {
+                that.state.pan = e.cy.pan()
+            })
+
+
+            this.cy.on('cxttap', function (e: any) {
+                if (!e.cyTarget.id) {
+                    let position = new GraphPosition(e.cyPosition.x + that.state.pan.x, e.cyPosition.y + that.state.pan.y)
+                    that.props.onCoreContextMenuRequested(position)
+
+                }
+            })
+            this.cy.on('taphold', function (e: any) {
+                if (!e.cyTarget.id) {
+                    let position = new GraphPosition(e.cyPosition.x + that.state.pan.x, e.cyPosition.y + that.state.pan.y)
+                    that.props.onCoreContextMenuRequested(position)
+                }
+            })
         }
-
-        this.cy.nodes().forEach((node:any)=> {
-            let inputNode = that.props.nodes.filter((n) => n.data.id == node.id())[0]
-            if (inputNode.nodeClasses.length) {
-                inputNode.nodeClasses.forEach((c: any) => {
-                    node.addClass(c)
-
-                })
-            }
-        })
-
-        this.cy.edges().forEach((link:any)=> {
-            let inputLink = that.props.links.filter((n) => n.data.id == link.id())[0]
-            if (inputLink.linkClasses.length) {
-                inputLink.linkClasses.forEach((c: any) => {
-                    link.addClass(c)
-
-                })
-            }
-        })
-
-
-        // save position on tap
-        this.cy.on('taphold', function (e: any) {
-            that.cy.position = e.cyPosition
-        })
-
-        // save pan context
-        this.cy.on('pan', function (e: any) {
-            that.state.pan = e.cy.pan()
-        })
-
-        this.cy.edges().on('click', function (e:any) {
-            that.props.onLinkSelected(e.cyTarget)
-        })
-
-        if(!(this.props.coreMenu && this.props.nodeMenu)){
-            this.cy.nodes().on('click',function (e:any){
-                if(!e.cyTarget.hasClass('parent')){
-                    that.props.onNodeDetailRequest(e.cyTarget.data())
-                }
-            })
-            this.cy.nodes().on('cxttap',function (e:any){
-                let clone = GraphElementFactory.getNode(e.cyTarget.data(), new GraphPosition(e.cyTarget.position().x  + that.state.pan.x, e.cyTarget.position().y + that.state.pan.y),VISIBILITY.VISIBLE)
-                that.props.onNodeDesktopMenuRequested(clone)
-            })
-            this.cy.nodes().on('taphold',function (e:any){
-                let clone = GraphElementFactory.getNode(e.cyTarget.data(), new GraphPosition(e.cyTarget.position().x  + that.state.pan.x, e.cyTarget.position().y + that.state.pan.y),VISIBILITY.VISIBLE)
-                that.props.onNodeDesktopMenuRequested(clone)
-            })
-            this.cy.on('cxttap',function (e:any){
-                if(!e.cyTarget.id) {
-                    let position  = new GraphPosition(e.cyPosition.x + that.state.pan.x, e.cyPosition.y + that.state.pan.y)
-                    that.props.onCoreDesktopMenuRequested(position)
-                }
-            })
-            this.cy.on('taphold',function (e:any){
-                if(!e.cyTarget.id) {
-                    let position  = new GraphPosition(e.cyPosition.x + that.state.pan.x, e.cyPosition.y + that.state.pan.y)
-                    that.props.onCoreDesktopMenuRequested(position)
-                }
-            })
-
-        }
-
         // setup drag and drop to connect to nodes
         this.cy.nodes().on('grab', function (e: any) {
 
@@ -182,7 +140,7 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
                 if (targetNode.id()) {
                     console.log("add link between" + node.id() + " and " + targetNode.id());
                     that.props.onNewLink(
-                        GraphElementFactory.getGraphElementAsLink(TimeService.getTimestamp(), node.id(), targetNode.id(),VISIBILITY.VISIBLE),
+                        GraphElementFactory.getGraphElementAsLink(this.props.identityService.createNewLinkId(), node.id(), targetNode.id(), VISIBILITY.VISIBLE),
                         oldPos
                     )
                     that.state.oldPosition.delete(node.id())
@@ -193,23 +151,46 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
                         new GraphPosition(node.position('x'), node.position('y'))
                     )
                 }
-                //node.off('free')
             });
 
         });
 
-        /*this.cy.on('tap', 'node.parent', function (evt: any) {
-         let node = evt.cyTarget;
-         let position = new GraphPosition(node.position().x + that.state.pan.x ,node.position().y + that.state.pan.y)
-         that.props.onFilterWindowRequested(GraphElementFactory.getNode(node.data(),node.position(), VISIBILITY.VISIBLE))
+        this.cy.edges().on('click', function (e: any) {
+            that.props.onLinkSelected(e.cyTarget)
+        })
+        this.cy.nodes().on('click', function (e: any) {
+            if (!e.cyTarget.hasClass('parent')) {
+                that.props.onNodeDetailRequest(e.cyTarget.data())
+            }
+        })
+        this.cy.nodes().on('cxttap', function (e: any) {
+            let clone = GraphElementFactory.getNode(e.cyTarget.data(), new GraphPosition(e.cyTarget.position().x + that.state.pan.x, e.cyTarget.position().y + that.state.pan.y), VISIBILITY.VISIBLE)
+            that.props.onNodeContextMenuRequested(clone)
+        })
+        this.cy.nodes().on('taphold', function (e: any) {
+            let clone = GraphElementFactory.getNode(e.cyTarget.data(), new GraphPosition(e.cyTarget.position().x + that.state.pan.x, e.cyTarget.position().y + that.state.pan.y), VISIBILITY.VISIBLE)
+            that.props.onNodeContextMenuRequested(clone)
+        })
 
-         });*/
+        this.cy.nodes().forEach((node: any) => {
+            let inputNode = that.props.nodes.filter((n) => n.data.id == node.id())[0]
+            if (inputNode.nodeClasses.length) {
+                inputNode.nodeClasses.forEach((c: any) => {
+                    node.addClass(c)
 
-        // add contextmenu
-        if(this.props.nodeMenu && this.props.coreMenu) {
-            this.cy.cxtmenu(this.props.coreMenu);
-            this.cy.cxtmenu(this.props.nodeMenu);
-        }
+                })
+            }
+        })
+
+        this.cy.edges().forEach((link: any) => {
+            let inputLink = that.props.links.filter((n) => n.data.id == link.id())[0]
+            if (inputLink.linkClasses.length) {
+                inputLink.linkClasses.forEach((c: any) => {
+                    link.addClass(c)
+
+                })
+            }
+        })
 
     }
 
@@ -230,13 +211,6 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
         return false;
     }
 
-    calcNodePosition(radius: number, angle: number, source: GraphPosition): GraphPosition {
-        let pos = new GraphPosition(
-            Math.round(source.x + radius * Math.cos((Math.PI / 180) * angle)),
-            Math.round(source.y + radius * Math.sin((Math.PI / 180) * angle))
-        )
-        return pos
-    }
 
     externalDrop(event: any) {
         let that = this
@@ -262,11 +236,11 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
                 this.props.onNewNode(
                     GraphElementFactory.getGraphElementAsNode(
                         event.id,
-                        that.calcNodePosition(100, Math.random() * 360, node.position()),VISIBILITY.VISIBLE
+                        DOMHelperService.calcNodePosition(node.position()), VISIBILITY.VISIBLE
                     )
                 )
                 this.props.onNewLink(
-                    GraphElementFactory.getGraphElementAsLink(TimeService.getTimestamp(), event.id, node.id(), VISIBILITY.VISIBLE),
+                    GraphElementFactory.getGraphElementAsLink(this.props.identityService.createNewLinkId(), event.id, node.id(), VISIBILITY.VISIBLE),
                     node.position()
                 )
             }
@@ -278,28 +252,11 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
                 new GraphPosition(
                     event.clientX - canvas.getBoundingClientRect().left - this.state.pan.x,
                     event.clientY - canvas.getBoundingClientRect().top - this.state.pan.y
-                ),VISIBILITY.VISIBLE
+                ), VISIBILITY.VISIBLE
             )
         )
 
     }
-
-    /*collapseEdges(edges: any) {
-     if(edges.length == 1){
-     this.props.onLinksCollapse([edges.data()])
-     }else{
-     let nodes:GraphLinkData[] = []
-     edges.forEach((edge:any) =>{
-     nodes.push(edge.data())
-     })
-     this.props.onLinksCollapse(nodes)
-     }
-     }*/
-
-    /*handleClickOnCollapse = () => {
-     let selectedEdges = this.cy.$("edge:selected");
-     this.collapseEdges(selectedEdges)
-     }*/
 
     render() {
         return (

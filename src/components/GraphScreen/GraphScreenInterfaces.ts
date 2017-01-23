@@ -7,18 +7,18 @@ import {DialogFactory} from "../../interfaces/DialogFactory";
 import {GraphPosition} from "../../model/GraphPosition";
 import {GraphNodeType} from "../../model/GraphNodeType";
 import {SearchFieldFactory} from "../../interfaces/SearchFieldFactory";
+import {IdentityService} from "../../interfaces/IdentityService";
 
 export interface  GraphScreenProps {
     viewToLoad: View;
-    onViewUpdate: Function;
-    onViewDelete: Function;
     nodeInformationProvider: NodeInformationProvider;
     operationService: OperationService;
     timestamp: string;
     dialogFactory: DialogFactory;
     searchFieldFactory: SearchFieldFactory;
     onNodeDetailRequest: Function;
-    nodeTypes?: GraphNodeType[]
+    nodeTypes: GraphNodeType[];
+    identityService: IdentityService;
 }
 
 export interface  GraphScreenStats {

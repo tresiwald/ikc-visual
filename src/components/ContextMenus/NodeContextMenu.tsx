@@ -12,6 +12,7 @@ import getMuiTheme = __MaterialUI.Styles.getMuiTheme;
 import {Menu} from "material-ui";
 import {MenuItem} from "material-ui";
 import {GraphNodeData} from "../../model/GraphNodeData";
+import {AgentService} from "../../common/AgentService";
 
 export interface NodeContextMenuProps {
     links: GraphLinkData[],
@@ -49,7 +50,8 @@ export default class NodeContextMenu extends React.Component<NodeContextMenuProp
         }
     }
 
-    componentWillMount = () => {
+    componentDidMount = () => {
+        this.adjustElement()
         let that = this
         document.addEventListener('click', function handler(event: any) {
             let element = document.getElementById('nodeContextMenu')
@@ -63,6 +65,44 @@ export default class NodeContextMenu extends React.Component<NodeContextMenuProp
         })
     }
 
+    componentDidUpdate = () => {
+        this.adjustElement()
+        let that = this
+        document.addEventListener('click', function handler(event: any) {
+            let element = document.getElementById('nodeContextMenu')
+            if (element) {
+                let box = element.getBoundingClientRect()
+                if (!(event.clientX > box.left && event.clientX < box.right && event.clientY > box.top && event.clientY < box.bottom)) {
+                    that.props.requestClose()
+                    document.removeEventListener('click', handler)
+                }
+            }
+        })
+    }
+
+
+    componentWillMount = () => {
+
+    }
+    adjustElement = () =>{
+        if(AgentService.agentIsMobile() && !AgentService.agentIsTabletLandscape()) {
+            var adjustmentY = 0
+
+            let element = document.getElementById('nodeContextMenu')
+            let box = element.getBoundingClientRect()
+            let bodyBox = document.body.getBoundingClientRect()
+
+            if ((box.left + box.width) > bodyBox.width) {
+                var adjustmentX = bodyBox.width - box.width
+                element.style.left = adjustmentX + 'px'
+            }
+
+            if ((box.top + box.height) > bodyBox.height) {
+                var adjustmentY = bodyBox.height - box.height
+                element.style.top = adjustmentY + 'px'
+            }
+        }
+    }
 
     handleExpandNode = (resultId:string) => {
         this.props.onExpandNode(resultId)

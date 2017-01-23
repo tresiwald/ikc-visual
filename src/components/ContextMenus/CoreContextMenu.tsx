@@ -14,6 +14,7 @@ import {GraphNodeData} from "../../model/GraphNodeData";
 import GraphNodeSearch from "../GraphSearchFields/GraphNodeSearch";
 import {TimeService} from "../../common/TimeService";
 import {SearchFieldFactory} from "../../interfaces/SearchFieldFactory";
+import {AgentService} from "../../common/AgentService";
 
 export interface CoreContextMenuProps {
     nodes: GraphNodeData[]
@@ -68,23 +69,23 @@ export default class CoreContextMenu extends React.Component<CoreContextMenuProp
     }
 
     adjustElement = () =>{
-        var adjustmentY = 0
+        if(AgentService.agentIsMobile() && !AgentService.agentIsTabletLandscape()) {
+            var adjustmentY = 0
 
-        let element = document.getElementById('coreContextMenu')
-        let box = element.getBoundingClientRect()
-        let bodyBox = document.body.getBoundingClientRect()
+            let element = document.getElementById('coreContextMenu')
+            let box = element.getBoundingClientRect()
+            let bodyBox = document.body.getBoundingClientRect()
 
-        if((box.left + box.width) > bodyBox.width){
-            var adjustmentX = bodyBox.width - box.width
-            element.style.left = adjustmentX + 'px'
+            if ((box.left + box.width) > bodyBox.width) {
+                var adjustmentX = bodyBox.width - box.width
+                element.style.left = adjustmentX + 'px'
+            }
+
+            if ((box.top + box.height) > bodyBox.height) {
+                var adjustmentY = bodyBox.height - box.height
+                element.style.top = adjustmentY + 'px'
+            }
         }
-
-        if((box.top + box.height) > bodyBox.height){
-            var adjustmentY = bodyBox.height - box.height
-            element.style.top = adjustmentY + 'px'
-
-        }
-
     }
 
     onRequestClose = () =>{
