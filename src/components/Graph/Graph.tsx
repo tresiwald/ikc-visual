@@ -301,6 +301,9 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
         })
 
 
+        /**
+         *
+         */
         this.props.onNewNode(
             GraphElementFactory.getGraphElementAsNode(
                 event.id,

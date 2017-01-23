@@ -733,7 +733,6 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
                                 position={this.state.tappedPosition}
                                 graphNodeTypes={this.props.nodeTypes}
                                 requestClose={this.hideCoreMenu.bind(this)}
-                                timestamp={TimeService.getTimestamp()}
                                 searchFieldFactory={this.props.searchFieldFactory}
                                 onNewNode={this.handleNewNodeFromMenu.bind(this)}
                                 onExistingNode={this.handleAddExistingNodeFromMenu.bind(this)}
@@ -765,7 +764,6 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
                                 position={this.state.tappedPosition}
                                 graphNodeTypes={this.props.nodeTypes}
                                 requestClose={this.hideCoreMenu.bind(this)}
-                                timestamp={TimeService.getTimestamp()}
                                 onEditNode={this.handleNodeDetailRequested.bind(this)}
                                 onHideNode={this.handleNodeCollapseFromMenu.bind(this)}
                                 onExpandAll={this.handleExpandAllFromMenu.bind(this)}
