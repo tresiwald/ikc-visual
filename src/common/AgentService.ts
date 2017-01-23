@@ -1,3 +1,6 @@
+
+/** Provides methods to check information about the current agent (browser) */
+
 export module AgentService {
 
     const isMobile = {
@@ -24,11 +27,19 @@ export module AgentService {
         }
     };
 
-    export function agentIsMobile() {
+    /**
+     * Check if the agent (browser) is used from a mobile device
+     * @returns {boolean}
+     */
+    export function agentIsMobile():boolean {
         return this.isMobile.any()
     }
 
-    export function agentIsTabletLandscape() {
+    /**
+     * Check if the agent (browser) is used from a tablet and the orientation is landscape
+     * @returns {boolean}
+     */
+    export function agentIsTabletLandscape():boolean {
         return this.isMobile.TabletLandscape()
     }
 }
