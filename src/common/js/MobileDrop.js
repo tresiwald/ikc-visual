@@ -8,50 +8,52 @@ var callbacksOnEnd = []
 
 div.style.boarderRadius = radius
 div.style.background = '#767676'
-div.setAttribute('id','tmpNode')
+div.setAttribute('id', 'tmpNode')
 div.style.height = '30px'
 div.style.width = '30px'
 div.style.opacity = '0.5'
 div.style.position = 'absolute'
 div.style.visibility = 'hidden'
 
-$(document).mousemove(function(e){
-    if(nodeId != null) {
-        $("#tmpNode").css({left: e.pageX - 15, top: e.pageY - 15,  cursor: 'pointer'});
+$(document).mousemove(function (e) {
+    if (nodeId != null) {
+        $("#tmpNode").css({left: e.pageX - 15, top: e.pageY - 15, cursor: 'pointer'});
     }
 });
 document.ontouchmove = function (e) {
-    if(nodeId != null) {
-        $("#tmpNode").css({left: e.targetTouches[0].pageX - 15, top: e.targetTouches[0].pageY - 15,  cursor: 'pointer'});
+    if (nodeId != null) {
+        $("#tmpNode").css({left: e.targetTouches[0].pageX - 15, top: e.targetTouches[0].pageY - 15, cursor: 'pointer'});
     }
 }
 document.ondrag = function (e) {
-    if(nodeId != null) {
-        $("#tmpNode").css({left: e.pageX - 15, top: e.pageY - 15,  cursor: 'pointer'});
+    if (nodeId != null) {
+        $("#tmpNode").css({left: e.pageX - 15, top: e.pageY - 15, cursor: 'pointer'});
     }
 }
 
-function registerDragZone(element, id){
-    element.onselectstart = function() {return false}
+function registerDragZone(element, id) {
+    element.onselectstart = function () {
+        return false
+    }
     element.onmousedown = function () {
         var mouseUp = false
         var moveX = 0
         var moveY = 0
 
-        let onMouseMove =  function  (e) {
-            if(!mouseUp) {
+        let onMouseMove = function (e) {
+            if (!mouseUp) {
                 if (moveX == 0 && moveY == 0) {
                     moveX = e.clientX
                     moveY = e.clientY
                 } else {
                     if (Math.abs(moveX - e.clientX) > 10 || Math.abs(moveY - e.clientY) > 10) {
                         showNodePlaceHolder(id, e)
-                        element.removeEventListener('mousemove',onMouseMove)
+                        element.removeEventListener('mousemove', onMouseMove)
                     }
                 }
             }
         }
-        element.addEventListener('mousemove',onMouseMove)
+        element.addEventListener('mousemove', onMouseMove)
 
         element.onmouseup = function () {
             mouseUp = true
@@ -64,9 +66,9 @@ function registerDragZone(element, id){
         var moveX = 0
         var moveY = 0
 
-        let onTouchMove =  function  (e) {
+        let onTouchMove = function (e) {
             e.preventDefault();
-            if(!touchEnd) {
+            if (!touchEnd) {
                 if (moveX == 0 && moveY == 0) {
                     moveX = e.targetTouches[0].clientX
                     moveY = e.targetTouches[0].clientY
@@ -74,13 +76,13 @@ function registerDragZone(element, id){
                     if (Math.abs(moveX - e.targetTouches[0].clientX) > 10 || Math.abs(moveY - e.targetTouches[0].clientY) > 10) {
                         showNodePlaceHolder(id, e)
                         notifyCallbacksForStart()
-                        element.removeEventListener('touchmove',onTouchMove)
+                        element.removeEventListener('touchmove', onTouchMove)
                     }
                 }
             }
         }
 
-        element.addEventListener('touchmove',onTouchMove)
+        element.addEventListener('touchmove', onTouchMove)
 
         element.ontouchend = function () {
             touchEnd = true
@@ -91,22 +93,22 @@ function registerDragZone(element, id){
 
 }
 
-function showNodePlaceHolder(id, e){
+function showNodePlaceHolder(id, e) {
     nodeId = id
     setInitPositionOfPlaceHolder(e)
     setInitStyleOfPlaceHolder()
 }
 
-function setInitPositionOfPlaceHolder(e){
-    if(e.type == 'mousemove') {
+function setInitPositionOfPlaceHolder(e) {
+    if (e.type == 'mousemove') {
         $("#tmpNode").css({left: e.pageX - 15, top: e.pageY - 15, cursor: 'pointer'});
     }
-    if(e.type == 'touchmove') {
-        $("#tmpNode").css({left: e.targetTouches[0].pageX - 15, top: e.targetTouches[0].pageY - 15,  cursor: 'pointer'});
+    if (e.type == 'touchmove') {
+        $("#tmpNode").css({left: e.targetTouches[0].pageX - 15, top: e.targetTouches[0].pageY - 15, cursor: 'pointer'});
     }
 }
 
-function setInitStyleOfPlaceHolder(){
+function setInitStyleOfPlaceHolder() {
     div.style.visibility = 'visible'
     document.body.style["-webkit-touch-callout"] = "none"
     document.body.style["-webkit-user-select"] = "none"
@@ -116,7 +118,7 @@ function setInitStyleOfPlaceHolder(){
     document.body.style["user-select"] = "none"
 }
 
-function setEndStyleOfPlaceHolder(){
+function setEndStyleOfPlaceHolder() {
     document.body.style["-webkit-touch-callout"] = ""
     document.body.style["-webkit-user-select"] = ""
     document.body.style["-khtml-user-select"] = ""
@@ -127,11 +129,11 @@ function setEndStyleOfPlaceHolder(){
     div.style.visibility = 'hidden'
 }
 
-function onDragStart(e){
+function onDragStart(e) {
     e.dataTransfer.setDragImage(document.createElement('img'), 0, 0);
 }
 
-function registerDropZone(onDrop){
+function registerDropZone(onDrop) {
     function moveEnd(e) {
         var container = document.getElementById('ikc-visual')
         var containerBox = container.getBoundingClientRect()
@@ -140,12 +142,12 @@ function registerDropZone(onDrop){
         var dropY = 0
         var element = null
 
-        if(e.type == 'mouseup') {
+        if (e.type == 'mouseup') {
             dropX = e.clientX
             dropY = e.clientY
         }
 
-        if(e.type == 'touchend') {
+        if (e.type == 'touchend') {
             dropX = div.getBoundingClientRect().left
             dropY = div.getBoundingClientRect().top
         }
@@ -155,9 +157,9 @@ function registerDropZone(onDrop){
         console.log(element)
 
         var dropOnContainer = containerBox.left < dropX && containerBox.right > dropX && containerBox.top < dropY && containerBox.bottom > dropY
-        if(dropOnContainer){
+        if (dropOnContainer) {
             onDrop({
-                clientX: getOffset(div).left + radius ,
+                clientX: getOffset(div).left + radius,
                 clientY: getOffset(div).top + radius,
                 id: nodeId
             })
@@ -166,20 +168,21 @@ function registerDropZone(onDrop){
         nodeId = null
         notifyCallbacksForEnd()
     }
+
     document.body.appendChild(div)
 
-    document.addEventListener("mouseup", function(e){
-        if(nodeId != null){
+    document.addEventListener("mouseup", function (e) {
+        if (nodeId != null) {
             moveEnd(e)
         }
     });
-    document.addEventListener("drop", function(e){
-        if(nodeId != null){
+    document.addEventListener("drop", function (e) {
+        if (nodeId != null) {
             moveEnd(e)
         }
     });
-    document.addEventListener("touchend", function(e){
-        if(nodeId != null){
+    document.addEventListener("touchend", function (e) {
+        if (nodeId != null) {
             moveEnd(e)
         }
     });
@@ -193,24 +196,26 @@ function getOffset(el) {
     }
 }
 
-function registerCallbackForStart(callback){
+function registerCallbackForStart(callback) {
     callbacksOnStart.push(callback)
 }
 
-function notifyCallbacksForStart(){
-    callbacksOnStart.forEach((callback) => {
+function notifyCallbacksForStart() {
+    callbacksOnStart.forEach((callback) = > {
         callback()
-    })
+    }
+)
 }
 
 
-function registerCallbackForEnd(callback){
+function registerCallbackForEnd(callback) {
     callbacksOnEnd.push(callback)
 }
 
-function notifyCallbacksForEnd(){
-    callbacksOnEnd.forEach((callback) => {
+function notifyCallbacksForEnd() {
+    callbacksOnEnd.forEach((callback) = > {
         callback()
-    })
+    }
+)
 }
 

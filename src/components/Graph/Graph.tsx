@@ -3,8 +3,8 @@ import {GraphProps, GraphState} from "./GraphInterfaces";
 import {GraphElementFactory} from "../../model/GraphElementFactory";
 import {GraphPosition} from "../../model/GraphPosition";
 import {VISIBILITY} from "../../model/VISIBILITY";
-import getMuiTheme = __MaterialUI.Styles.getMuiTheme;
 import {DOMHelperService} from "../../common/DOMHelperService";
+import getMuiTheme = __MaterialUI.Styles.getMuiTheme;
 
 let cytoscape = require('cytoscape');
 let cytoscapeCtxmenu = require('cytoscape-cxtmenu');

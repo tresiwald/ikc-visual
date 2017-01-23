@@ -1,4 +1,4 @@
-export module AgentService{
+export module AgentService {
 
     const isMobile = {
         Android: function () {
@@ -10,7 +10,7 @@ export module AgentService{
         iOS: function () {
             return navigator.userAgent.match(/iPhone|iPod/i);
         },
-        TabletLandscape:function () {
+        TabletLandscape: function () {
             return window.innerWidth > 1024 && window.matchMedia("(orientation: landscape)").matches;
         },
         Opera: function () {
@@ -24,10 +24,11 @@ export module AgentService{
         }
     };
 
-    export function agentIsMobile(){
+    export function agentIsMobile() {
         return this.isMobile.any()
     }
-    export function agentIsTabletLandscape(){
+
+    export function agentIsTabletLandscape() {
         return this.isMobile.TabletLandscape()
     }
 }

@@ -1,10 +1,9 @@
 import {NodeInformationProvider} from "./interfaces/NodeInformationProvider";
-import {GraphNodeData} from "./model/GraphNodeData";
 
 export class TestNodeInformationProvider implements NodeInformationProvider {
 
     getNodeTitle(id: string): string {
-        let random = Math.round(Math.random()*100)
+        let random = Math.round(Math.random() * 100)
         return "Node-" + random
     }
 

@@ -1,18 +1,14 @@
 import * as React from "react";
-import {ListItem, Paper, List, TextField, IconButton, FlatButton} from "material-ui";
-import {MuiThemeProvider} from "material-ui/styles";
+import {ListItem, Paper, List} from "material-ui";
 import {GraphLinkData} from "../../model/GraphLinkData";
-import MapsZoomOutMap from "material-ui/svg-icons/maps/zoom-out-map";
 import {GraphPosition} from "../../model/GraphPosition";
 import {GraphNodeType} from "../../model/GraphNodeType";
 import {SearchFieldFactory} from "../../interfaces/SearchFieldFactory";
+import {GraphNodeData} from "../../model/GraphNodeData";
+import {AgentService} from "../../common/AgentService";
 
 import render = __React.__DOM.render;
 import getMuiTheme = __MaterialUI.Styles.getMuiTheme;
-import {Menu} from "material-ui";
-import {MenuItem} from "material-ui";
-import {GraphNodeData} from "../../model/GraphNodeData";
-import {AgentService} from "../../common/AgentService";
 
 export interface NodeContextMenuProps {
     links: GraphLinkData[],
@@ -84,8 +80,8 @@ export default class NodeContextMenu extends React.Component<NodeContextMenuProp
     componentWillMount = () => {
 
     }
-    adjustElement = () =>{
-        if(AgentService.agentIsMobile() && !AgentService.agentIsTabletLandscape()) {
+    adjustElement = () => {
+        if (AgentService.agentIsMobile() && !AgentService.agentIsTabletLandscape()) {
             var adjustmentY = 0
 
             let element = document.getElementById('nodeContextMenu')
@@ -104,7 +100,7 @@ export default class NodeContextMenu extends React.Component<NodeContextMenuProp
         }
     }
 
-    handleExpandNode = (resultId:string) => {
+    handleExpandNode = (resultId: string) => {
         this.props.onExpandNode(resultId)
     }
 
@@ -116,7 +112,7 @@ export default class NodeContextMenu extends React.Component<NodeContextMenuProp
         this.props.onCollapseAll()
     }
 
-    handleNewNodeToConnect = (type:GraphNodeType) => {
+    handleNewNodeToConnect = (type: GraphNodeType) => {
         this.props.onNewNodeToConnect(type)
     }
 
@@ -132,7 +128,7 @@ export default class NodeContextMenu extends React.Component<NodeContextMenuProp
         this.props.onHideNode()
     }
 
-    onRequestClose = () =>{
+    onRequestClose = () => {
         this.props.requestClose()
     }
 
@@ -149,7 +145,7 @@ export default class NodeContextMenu extends React.Component<NodeContextMenuProp
                 left: this.props.position.x,
                 top: this.props.position.y,
             },
-            contextMenuItem:{
+            contextMenuItem: {
                 height: "44px"
             }
         }
@@ -191,7 +187,7 @@ export default class NodeContextMenu extends React.Component<NodeContextMenuProp
                         <ListItem primaryText="Collapse All Links" onTouchTap={this.handleCollapseAll.bind(this)}/>
                         <ListItem primaryText="Expand All Links" onTouchTap={this.handleExpandAll.bind(this)}/>
                         {(() => {
-                            if(this.props.links.length > 0) {
+                            if (this.props.links.length > 0) {
                                 let links = this.props.links.map((link) => link.id)
                                 return this.props.searchFieldFactory.getLinkSearchField(this.handleExpandNode.bind(this), links)
                             }

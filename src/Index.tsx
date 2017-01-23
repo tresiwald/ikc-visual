@@ -1,15 +1,15 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import getMuiTheme = __MaterialUI.Styles.getMuiTheme;
 import GraphScreen from "./components/GraphScreen/GraphScreen";
 import {TestNodeInformationProvider} from "./TestNodeInformationProvider";
 import {TestOperationService} from "./TestOperationService";
-import injectTapEventPlugin = require("react-tap-event-plugin");
-import {TimeService} from "./common/TimeService"
+import {TimeService} from "./common/TimeService";
 import {TestDialogFactory} from "./TestDialogFactory";
 import {MuiThemeProvider} from "material-ui/styles";
 import {ViewFactory} from "./model/ViewFactory";
 import TestDrag from "./TestDrag";
+import getMuiTheme = __MaterialUI.Styles.getMuiTheme;
+import injectTapEventPlugin = require("react-tap-event-plugin");
 
 let viewToLoadJson = '{' +
     '"nodes":[' +
@@ -32,15 +32,18 @@ let testOperationService = new TestOperationService();
 let testDialogFactory = new TestDialogFactory();
 
 let tmp = new Map<string, Function>()
-tmp.set('Dropbox', () => {console.log('createDropbox')})
-tmp.set('Evernote', () => {console.log('createEvernote')})
+tmp.set('Dropbox', () => {
+    console.log('createDropbox')
+})
+tmp.set('Evernote', () => {
+    console.log('createEvernote')
+})
 
 function init() {
 
 }
 /** Init need tap eventplug of material-ui */
 injectTapEventPlugin();
-
 
 
 ReactDOM.render((
@@ -51,7 +54,7 @@ ReactDOM.render((
                 <GraphScreen nodeInformationProvider={testNodeInformationProvider}
                              onViewDelete={()=>{console.log("implement a function to delete the view.")}}
                              onViewSave={()=>{console.log("implement a function to save the view.")}}
-                              operationService={testOperationService}
+                             operationService={testOperationService}
                              viewToLoad={viewToLoad}
                              timestamp={TimeService.getTimestamp()}
                              dialogFactory={testDialogFactory}

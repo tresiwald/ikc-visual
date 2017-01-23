@@ -1,20 +1,13 @@
 import * as React from "react";
-import {ListItem, Paper, List, TextField, IconButton, FlatButton} from "material-ui";
-import {MuiThemeProvider} from "material-ui/styles";
-import {GraphLinkData} from "../../model/GraphLinkData";
-import MapsZoomOutMap from "material-ui/svg-icons/maps/zoom-out-map";
+import {ListItem, Paper, List} from "material-ui";
 import {GraphPosition} from "../../model/GraphPosition";
 import {GraphNodeType} from "../../model/GraphNodeType";
+import {GraphNodeData} from "../../model/GraphNodeData";
+import {SearchFieldFactory} from "../../interfaces/SearchFieldFactory";
+import {AgentService} from "../../common/AgentService";
 
 import render = __React.__DOM.render;
 import getMuiTheme = __MaterialUI.Styles.getMuiTheme;
-import {Menu} from "material-ui";
-import {MenuItem} from "material-ui";
-import {GraphNodeData} from "../../model/GraphNodeData";
-import GraphNodeSearch from "../GraphSearchFields/GraphNodeSearch";
-import {TimeService} from "../../common/TimeService";
-import {SearchFieldFactory} from "../../interfaces/SearchFieldFactory";
-import {AgentService} from "../../common/AgentService";
 
 export interface CoreContextMenuProps {
     nodes: GraphNodeData[]
@@ -68,8 +61,8 @@ export default class CoreContextMenu extends React.Component<CoreContextMenuProp
         this.adjustElement()
     }
 
-    adjustElement = () =>{
-        if(AgentService.agentIsMobile() && !AgentService.agentIsTabletLandscape()) {
+    adjustElement = () => {
+        if (AgentService.agentIsMobile() && !AgentService.agentIsTabletLandscape()) {
             var adjustmentY = 0
 
             let element = document.getElementById('coreContextMenu')
@@ -88,15 +81,15 @@ export default class CoreContextMenu extends React.Component<CoreContextMenuProp
         }
     }
 
-    onRequestClose = () =>{
+    onRequestClose = () => {
         this.props.requestClose()
     }
 
-    handleNewNode = (type:GraphNodeType) => {
+    handleNewNode = (type: GraphNodeType) => {
         this.props.onNewNode(type)
     }
 
-    handleExistingNode = (nodeId:string) => {
+    handleExistingNode = (nodeId: string) => {
         this.props.onExistingNode(nodeId)
     }
 
@@ -114,7 +107,7 @@ export default class CoreContextMenu extends React.Component<CoreContextMenuProp
                 left: this.props.position.x,
                 top: this.props.position.y,
             },
-            contextMenuItem:{
+            contextMenuItem: {
                 height: "44px"
             }
         }

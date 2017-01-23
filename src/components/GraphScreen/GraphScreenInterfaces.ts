@@ -31,9 +31,9 @@ export interface  GraphScreenStats {
     dialogSearchNodeToConnectOpen?: boolean;
     tappedNode?: GraphNodeData;
     tappedPosition?: GraphPosition;
-    coreContextMenuOpen?:boolean;
-    nodeContextMenuOpen?:boolean;
+    coreContextMenuOpen?: boolean;
+    nodeContextMenuOpen?: boolean;
     newNodeType?: GraphNodeType
     collapseToolbarNeeded?: boolean
-    showLabels?:boolean
+    showLabels?: boolean
 }

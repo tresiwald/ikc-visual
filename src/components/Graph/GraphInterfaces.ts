@@ -10,10 +10,10 @@ export interface GraphProps {
     onNewLink: Function
     onNodePositionUpdate: Function
     onNodeDetailRequest?: Function
-    onCoreContextMenuRequested?:Function
-    onNodeContextMenuRequested?:Function
-    onLinkSelected?:Function
-    onPanChanged?:Function
+    onCoreContextMenuRequested?: Function
+    onNodeContextMenuRequested?: Function
+    onLinkSelected?: Function
+    onPanChanged?: Function
     identityService: IdentityService
 }
 

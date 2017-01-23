@@ -8,5 +8,5 @@ export interface OperationService {
     createNodeFromDialogState(state: DialogNewNodeState): void
     createNodeWithLinkFromDialogState(state: DialogNewNodeToConnectState): void
     createLink(id: string, source: string, target: string, label: string): void;
-    saveView(view:View):void;
+    saveView(view: View): void;
 }

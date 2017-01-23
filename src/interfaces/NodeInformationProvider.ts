@@ -1,4 +1,3 @@
-import {GraphNodeData} from "../model/GraphNodeData";
 /**
  * Provides Information for visualization => connection to specific data structure
  */

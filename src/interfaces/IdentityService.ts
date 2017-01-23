@@ -1,4 +1,4 @@
-export interface IdentityService{
-    createNewNodeId():any
-    createNewLinkId():any
+export interface IdentityService {
+    createNewNodeId(): any
+    createNewLinkId(): any
 }
