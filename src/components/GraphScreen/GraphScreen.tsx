@@ -761,6 +761,7 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
 
 
                 {(() => {
+                    /** Render core context menu if needed */
                     if (this.state.coreContextMenuOpen) {
                         let nodes: GraphNodeData[] = this.processNodesForContextMenu()
 
@@ -779,6 +780,7 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
                 })()}
 
                 {(() => {
+                    /** Render node context menu if needed */
                     if (this.state.nodeContextMenuOpen) {
                         let nodes: GraphNodeData[] = this.processNodesForContextMenu()
                         let links: GraphLinkData[] = this.processLinksForNodeContextMenu()
@@ -804,6 +806,7 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
                 })()}
 
                 {(() => {
+                    /** Render 'new node' dialog if needed */
                     if (this.state.dialogNewNodeOpen) {
                         return (
                             this.props.dialogFactory.getDialogNodeNewNode(
@@ -815,6 +818,7 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
                             )
                         )
                     }
+                    /** Render 'new node and connect to existing node' dialog if needed */
                     if (this.state.dialogNewNodeToConnectOpen) {
                         return (
                             this.props.dialogFactory.getDialogNodeNewNodeToConnect(
@@ -826,6 +830,7 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
                             )
                         )
                     }
+                    /** Render 'search node and connect to existing node' dialog if needed */
                     if (this.state.dialogSearchNodeToConnectOpen) {
                         return (
                             this.props.dialogFactory.getDialogNodeSearchToConnect(
@@ -837,6 +842,7 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
 
                 <div id="toolbar">
                     {(() => {
+                        /** Render collapse toolbar if needed */
                         if (this.state.collapseToolbarNeeded) {
                             return (
                                 <FlatButton
@@ -847,6 +853,7 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
                         }
                     })()}
                     {(() => {
+                        /** Update toolbar */
                         if (this.state.showLabels) {
                             return (
                                 <FlatButton

@@ -35,14 +35,6 @@ export interface DialogFactory {
     getDialogNodeNewNodeToConnect(open: boolean, onSave: Function, onRequestClose: Function, link: GraphLinkElement, type: GraphNodeType): React.Component<DialogNewNodeToConnectProps,DialogNewNodeToConnectState>
 
     /**
-     * Create a dialog to search and select an existing node
-     * @param open - Boolean represent if the dialog is visible or not
-     * @param onSelect - Function on node is selected
-     * @param onRequestClose - Function to close the dialog
-     */
-    getDialogNodeSearch(open: boolean, onSelect: Function, onRequestClose: Function): React.Component<DialogNodeSearchProps,DialogNodeSearchState>
-
-    /**
      * Create a dialog to search and select an existing node and connect it directly to another node
      * @param open - Boolean represent if the dialog is visible or not
      * @param onSelect - Function on node is selected
