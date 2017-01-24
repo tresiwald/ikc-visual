@@ -9,14 +9,12 @@ import {DialogNewNodeState} from "../../interfaces/DialogNewNodeInterfaces";
 import {DialogNewNodeToConnectState} from "../../interfaces/DialogNewNodeToConnectInterfaces";
 import {DialogNodeSearchToConnectState} from "../../interfaces/DialogNodeSearchToConnectInterfaces";
 import {VISIBILITY} from "../../model/VISIBILITY";
-import {TimeService} from "../../common/TimeService";
 import {FlatButton} from "material-ui";
 import {ViewFactory} from "../../model/ViewFactory";
 import {GraphNodeType} from "../../model/GraphNodeType";
 import CoreContextMenu from "../ContextMenus/CoreContextMenu";
 import NodeContextMenu from "../ContextMenus/NodeContextMenu";
 import {DOMHelperService} from "../../common/DOMHelperService";
-import {DialogNodeSearchState} from "../../interfaces/DialogNodeSearchInterfaces";
 
 /**
  * Wrapper react component for the graph component. This component will be used from any other application which use this package.
@@ -93,7 +91,7 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
 
     /**
      * Hides a certain node and save
-     * @param nodeId
+     * @param node
      */
     hideNode = (node:GraphNodeElement) => {
         node.visibility = VISIBILITY.HIDDEN
@@ -102,7 +100,7 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
 
     /**
      * Hides a certain link and save
-     * @param linkId
+     * @param link
      */
     hideLink = (link:GraphLinkElement) => {
         link.visibility = VISIBILITY.HIDDEN
@@ -111,7 +109,7 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
 
     /**
      * Shows a certain node and save
-     * @param nodeId
+     * @param node
      */
     showNode = (node:GraphNodeElement) => {
         node.visibility = VISIBILITY.VISIBLE
@@ -120,7 +118,7 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
 
     /**
      * Shows a certain link and save
-     * @param linkId
+     * @param link
      */
     showLink = (link:GraphLinkElement) => {
         link.visibility = VISIBILITY.VISIBLE
@@ -201,7 +199,7 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
      * @param position - new position
      */
     fromGraphPositionUpdated = (nodeId: string, position: GraphPosition) => {
-        let node = this.state.this.getNode(nodeId)
+        let node = this.getNode(nodeId)
         node.position = position
         this.saveNode(node)
         this.saveView()
@@ -227,8 +225,6 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
      * @param nodeId
      */
     fromMenuExistingNode = (nodeId: string) => {
-        let nodes = this.state.nodes
-
         /** Make node visible and update position */
         let node = this.getNode(nodeId)
         node.position = this.state.tappedPosition
@@ -269,7 +265,7 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
     fromDialogExistingNodeToConnect = (state: DialogNodeSearchToConnectState) => {
         /** Save new node and link */
         let node = GraphElementFactory.getNode(
-            this.state.this.getNode(state.link.target).data, new GraphPosition(this.state.tappedPosition.x + 40, this.state.tappedPosition.y + 40), VISIBILITY.VISIBLE)
+            this.getNode(state.link.target).data, new GraphPosition(this.state.tappedPosition.x + 40, this.state.tappedPosition.y + 40), VISIBILITY.VISIBLE)
         this.saveNode(node)
 
         let link = GraphElementFactory.getGraphElementAsLink(
@@ -296,7 +292,6 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
      * @param id
      */
     hideNodeAndHisLinks = (id: string) => {
-        let nodes = this.state.nodes
         let links = this.state.links
 
         /** Hide node */
@@ -391,7 +386,6 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
      */
     handleNodeCollapse(nodeId: string) {
         let links = this.state.links
-        let nodes = this.state.nodes
 
         /** Hide node */
         let node = this.getNode(nodeId)
