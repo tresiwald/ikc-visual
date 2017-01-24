@@ -278,11 +278,14 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
         let tmpNodePosition = this.cy.$('#tmp').position()
         this.cy.$('#tmp').remove()
 
+        var nodeCreated = false
         /**
          * Check if the drop occurred to a existing node => a new link is needed
          */
         this.cy.nodes().forEach((node: any) => {
             if (DOMHelperService.close(tmpNodePosition, node.position())) {
+
+                nodeCreated = true
 
                 /** Create the dropped node with a random position around the target node */
                 this.props.onNewNode(
@@ -299,20 +302,20 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
                 )
             }
         })
-
-
         /**
-         *
+         * Create node without new link
          */
-        this.props.onNewNode(
-            GraphElementFactory.getGraphElementAsNode(
-                event.id,
-                new GraphPosition(
-                    event.clientX - canvas.getBoundingClientRect().left - this.state.pan.x,
-                    event.clientY - canvas.getBoundingClientRect().top - this.state.pan.y
-                ), VISIBILITY.VISIBLE
+        if(!nodeCreated) {
+            this.props.onNewNode(
+                GraphElementFactory.getGraphElementAsNode(
+                    event.id,
+                    new GraphPosition(
+                        event.clientX - canvas.getBoundingClientRect().left - this.state.pan.x,
+                        event.clientY - canvas.getBoundingClientRect().top - this.state.pan.y
+                    ), VISIBILITY.VISIBLE
+                )
             )
-        )
+        }
 
     }
 

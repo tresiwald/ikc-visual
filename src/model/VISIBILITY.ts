@@ -1,5 +1,8 @@
+/**
+ * Enumerator for the visibility flag of nodes and links
+ */
 export class VISIBILITY {
-    // boilerplate
+
     constructor(public value: string) {
     }
 
@@ -7,7 +10,6 @@ export class VISIBILITY {
         return this.value;
     }
 
-    // values
     static VISIBLE = new VISIBILITY("VISIBLE");
     static HIDDEN = new VISIBILITY("HIDDEN");
 }

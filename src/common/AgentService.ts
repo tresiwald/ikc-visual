@@ -3,36 +3,40 @@
 
 export module AgentService {
 
-    const isMobile = {
-        Android: function () {
-            return navigator.userAgent.match(/Android/i);
-        },
-        BlackBerry: function () {
-            return navigator.userAgent.match(/BlackBerry/i);
-        },
-        iOS: function () {
-            return navigator.userAgent.match(/iPhone|iPod/i);
-        },
-        TabletLandscape: function () {
-            return window.innerWidth > 1024 && window.matchMedia("(orientation: landscape)").matches;
-        },
-        Opera: function () {
-            return navigator.userAgent.match(/Opera Mini/i);
-        },
-        Windows: function () {
-            return navigator.userAgent.match(/IEMobile/i) || navigator.userAgent.match(/WPDesktop/i);
-        },
-        any: function () {
-            return (this.Android() || this.BlackBerry() || this.iOS() || this.Opera() || this.Windows());
-        }
-    };
+    export function android() {
+        return navigator.userAgent.match(/Android/i);
+    }
+
+    export function blackberry() {
+        return navigator.userAgent.match(/BlackBerry/i);
+    }
+
+    export function ios() {
+        return navigator.userAgent.match(/iPhone|iPod/i) || (navigator.userAgent.match(/iPad/i) && window.matchMedia("(orientation: portrait)").matches);
+    }
+
+    export function tabletLandscape() {
+        return window.innerWidth > 1024 && window.matchMedia("(orientation: landscape)").matches;
+    }
+
+    export function opera() {
+        return navigator.userAgent.match(/Opera Mini/i);
+    }
+
+    export function windows() {
+        return navigator.userAgent.match(/IEMobile/i) || navigator.userAgent.match(/WPDesktop/i);
+    }
+
+    export function any() {
+        return (this.android() || this.blackberry() || this.ios() || this.opera() || this.windows());
+    }
 
     /**
      * Check if the agent (browser) is used from a mobile device
      * @returns {boolean}
      */
     export function agentIsMobile():boolean {
-        return this.isMobile.any()
+        return this.any()
     }
 
     /**
@@ -40,6 +44,6 @@ export module AgentService {
      * @returns {boolean}
      */
     export function agentIsTabletLandscape():boolean {
-        return this.isMobile.TabletLandscape()
+        return this.TabletLandscape()
     }
 }

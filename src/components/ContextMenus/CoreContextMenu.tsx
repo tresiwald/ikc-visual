@@ -5,6 +5,7 @@ import {GraphNodeType} from "../../model/GraphNodeType";
 import {GraphNodeData} from "../../model/GraphNodeData";
 import {SearchFieldFactory} from "../../interfaces/SearchFieldFactory";
 import {AgentService} from "../../common/AgentService";
+import {DOMHelperService} from "../../common/DOMHelperService";
 
 import render = __React.__DOM.render;
 import getMuiTheme = __MaterialUI.Styles.getMuiTheme;
@@ -43,21 +44,30 @@ export default class CoreContextMenu extends React.Component<CoreContextMenuProp
      */
     componentWillMount = () => {
         let that = this
-        document.addEventListener('click', function handler(event: any) {
-            let element = document.getElementById('coreContextMenu')
-            if (element) {
-
-                /** Get the coordinates of the context menu */
-                let box = element.getBoundingClientRect()
-
-                /** Compare the click position with the coordinates of the context menu*/
-                if (!(event.clientX > box.left && event.clientX < box.right && event.clientY > box.top && event.clientY < box.bottom)) {
-                    that.props.requestClose()
-                    document.removeEventListener('click', handler)
-                }
-            }
-        })
+        document.addEventListener('click', this.checkCloseNeeded.bind(this))
+        document.addEventListener('touchstart', this.checkCloseNeeded.bind(this))
     }
+
+    checkCloseNeeded = (e:any) => {
+        var elementMouseIsOver = null
+        if (e.type == 'click') {
+            elementMouseIsOver = document.elementFromPoint(e.clientX, e.clientY);
+        } else {
+            elementMouseIsOver = document.elementFromPoint(e.targetTouches[0].clientX, e.targetTouches[0].clientY);
+        }
+        if (DOMHelperService.isDescendant(document.getElementById('coreContextMenu'), elementMouseIsOver)) {
+            console.log(elementMouseIsOver)
+        } else {
+            this.props.requestClose()
+        }
+    }
+
+    componentWillUnmount = () => {
+        document.removeEventListener('click', this.checkCloseNeeded)
+        document.removeEventListener('touchstart', this.checkCloseNeeded)
+
+    }
+
 
     /**
      * Adjust element after the component did mount

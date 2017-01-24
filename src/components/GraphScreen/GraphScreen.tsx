@@ -16,7 +16,11 @@ import {GraphNodeType} from "../../model/GraphNodeType";
 import CoreContextMenu from "../ContextMenus/CoreContextMenu";
 import NodeContextMenu from "../ContextMenus/NodeContextMenu";
 import {DOMHelperService} from "../../common/DOMHelperService";
+import {DialogNodeSearchState} from "../../interfaces/DialogNodeSearchInterfaces";
 
+/**
+ * Wrapper react component for the graph component. This component will be used from any other application which use this package.
+ */
 export default class GraphScreen extends React.Component<GraphScreenProps, GraphScreenStats> {
     constructor(props: any) {
         super(props);
@@ -25,307 +29,303 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
             links: new Map<string, GraphLinkElement>(),
             showLabels: false
         }
-        document.addEventListener('click', this.handleCheckClickForContextMenus.bind(this))
-        document.addEventListener('touchstart', this.handleCheckClickForContextMenus.bind(this))
     }
 
-    handleCheckClickForContextMenus(e: any) {
-        var elementMouseIsOver = null
-        if (e.type == 'click') {
-            elementMouseIsOver = document.elementFromPoint(e.clientX, e.clientY);
-        } else {
-            elementMouseIsOver = document.elementFromPoint(e.targetTouches[0].clientX, e.targetTouches[0].clientY);
-        }
-        if (DOMHelperService.isDescendant(document.getElementById('coreContextMenu'), elementMouseIsOver)) {
-            console.log(elementMouseIsOver)
-        } else {
-            if (this.state.coreContextMenuOpen) {
-                this.hideCoreMenu()
-            }
-        }
-        if (DOMHelperService.isDescendant(document.getElementById('nodeContextMenu'), elementMouseIsOver)) {
-            console.log(elementMouseIsOver)
-        } else {
-            if (this.state.nodeContextMenuOpen) {
-                this.hideNodeMenu()
-            }
-        }
-    }
-
-    componentWillUnmount() {
-        document.removeEventListener('click', this.handleCheckClickForContextMenus.bind(this))
-        document.removeEventListener('touchstart', this.handleCheckClickForContextMenus.bind(this))
-    }
-
+    /**
+     * Load the initial state
+     */
     initState = () => {
+
+        /** Check if reload is needed */
         if (this.state.timestamp != this.props.timestamp) {
             this.state.timestamp = this.props.timestamp
 
+            /** Fill up the maps */
             let nodes = new Map<string, GraphNodeElement>()
             let links = new Map<string, GraphLinkElement>()
 
             this.props.viewToLoad.nodes.forEach((node) => {
                 nodes.set(node.data.id, node)
             })
-            this.props.viewToLoad.links.forEach((link) => links.set(link.data.id, link))
+            this.props.viewToLoad.links.forEach((link) =>
+                links.set(link.data.id, link)
+            )
 
             this.state.nodes = nodes
             this.state.links = links
         }
     }
-
-    onLinkCreated = (newLink: GraphLinkElement, oldSourcePosition: GraphPosition) => {
+    /**
+     * Save or update a link
+     * @param link
+     */
+    saveLink = (link:GraphLinkElement) => {
         let links = this.state.links
-        links.set(newLink.data.id, newLink)
-
-        this.onNodePositionUpdated(newLink.data.source, oldSourcePosition)
-
-        this.state.links = links
-        this.saveView()
-        this.props.operationService.createLink(newLink.data.id, newLink.data.source, newLink.data.target, "")
-
-        this.forceUpdate()
+        this.state.links.set(link.data.id, link)
     }
 
-    onNodeCreated = (newNode: GraphNodeElement) => {
+    /**
+     * Save or update a node
+     * @param node
+     */
+    saveNode = (node:GraphNodeElement) => {
         let nodes = this.state.nodes
-        newNode.visibility = VISIBILITY.VISIBLE
-        nodes.set(newNode.data.id, newNode)
+        nodes.set(node.data.id, node)
+    }
 
+    /**
+     * Return a certain node
+     * @param nodeId
+     * @return {GraphNodeElement}
+     */
+    getNode = (nodeId:string) => {
+        return this.state.nodes.get(nodeId)
+    }
+
+    /**
+     * Return a certain link
+     * @param linkId
+     * @return {GraphLinkElement}
+     */
+    getLink = (linkId:string) => {
+        return this.state.links.get(linkId)
+    }
+
+    /**
+     * Hides a certain node and save
+     * @param nodeId
+     */
+    hideNode = (node:GraphNodeElement) => {
+        node.visibility = VISIBILITY.HIDDEN
+        this.saveNode(node)
+    }
+
+    /**
+     * Hides a certain link and save
+     * @param linkId
+     */
+    hideLink = (link:GraphLinkElement) => {
+        link.visibility = VISIBILITY.HIDDEN
+        this.saveLink(link)
+    }
+
+    /**
+     * Shows a certain node and save
+     * @param nodeId
+     */
+    showNode = (node:GraphNodeElement) => {
+        node.visibility = VISIBILITY.VISIBLE
+        this.saveNode(node)
+    }
+
+    /**
+     * Shows a certain link and save
+     * @param linkId
+     */
+    showLink = (link:GraphLinkElement) => {
+        link.visibility = VISIBILITY.VISIBLE
+        this.saveLink(link)
+    }
+
+    /**
+     * Check if there additional elements to display
+     * @param sourceNode
+     */
+    checkMoreElementsToDisplay = (sourceNode:GraphNodeElement) => {
         let links = this.state.links
+        let nodes = this.state.nodes
+
         links.forEach((link) => {
-            if (link.data.source == newNode.data.id) {
-                link.visibility = VISIBILITY.VISIBLE
+            /** Make all children visible and their link to the new node */
+            if (link.data.source == sourceNode.data.id) {
+                this.showLink(link)
 
-                let targetNode = nodes.get(link.data.target)
+                /** Calculate new position for child node and make it visible*/
+                let targetNode = this.getNode(link.data.target)
                 if (targetNode.position.x == 0 && targetNode.position.y == 0) {
-                    targetNode.position = DOMHelperService.calcNodePosition(newNode.position)
+                    targetNode.position = DOMHelperService.calcNodePosition(sourceNode.position)
                 }
-                targetNode.visibility = VISIBILITY.VISIBLE
-                nodes.set(targetNode.data.id, targetNode)
+                this.showNode(targetNode)
 
+                /** Check if there are other hidden links which have to make visible */
                 links.forEach((targetLink) => {
-                    if (targetLink.data.source == targetNode.data.id && nodes.get(targetLink.data.target).visibility.value == VISIBILITY.VISIBLE.value) {
-                        targetLink.visibility = VISIBILITY.VISIBLE
+                    if (targetLink.data.source == targetNode.data.id && this.getNode(targetLink.data.target).visibility.value == VISIBILITY.VISIBLE.value) {
+                        this.showLink(targetLink)
                     }
-                    if (targetLink.data.target == targetNode.data.id && nodes.get(targetLink.data.source).visibility.value == VISIBILITY.VISIBLE.value) {
-                        targetLink.visibility = VISIBILITY.VISIBLE
+                    if (targetLink.data.target == targetNode.data.id && this.getNode(targetLink.data.source).visibility.value == VISIBILITY.VISIBLE.value) {
+                        this.showLink(targetLink)
                     }
                 })
             }
 
-            if (link.data.source == newNode.data.id && nodes.get(link.data.target).visibility.value == VISIBILITY.VISIBLE.value) {
-                link.visibility = VISIBILITY.VISIBLE
+            /** Check if there are other hidden links which have to make visible */
+            if (link.data.source == sourceNode.data.id && this.getNode(link.data.target).visibility.value == VISIBILITY.VISIBLE.value) {
+                this.showLink(link)
             }
-            if (link.data.target == newNode.data.id && nodes.get(link.data.source).visibility.value == VISIBILITY.VISIBLE.value) {
-                link.visibility = VISIBILITY.VISIBLE
+            if (link.data.target == sourceNode.data.id && this.getNode(link.data.source).visibility.value == VISIBILITY.VISIBLE.value) {
+                this.showLink(link)
             }
         })
+    }
 
-        this.state.nodes = nodes
-        this.state.links = links
+    /**
+     * Save the new link from graph component in the model, the view update has to executed from outside this package
+     * @param newLink - the new link element to save
+     * @param oldSourcePosition - oldposition of the source node
+     */
+    fromGraphNewLink = (newLink: GraphLinkElement, oldSourcePosition: GraphPosition) => {
+        /** Save link */
+        this.saveLink(newLink)
+
+        /** Update source node to old position */
+        this.fromGraphPositionUpdated(newLink.data.source, oldSourcePosition)
+
+        /** Save the updated view and make sure that external models are notified about the new link */
+        this.saveView()
+        this.props.operationService.createLink(newLink.data.id, newLink.data.source, newLink.data.target, "")
+    }
+
+    /**
+     * Save a new node a make sure all his children are visible
+     * @param existingNode - node to save or update
+     */
+    fromGraphExistingNode = (existingNode: GraphNodeElement) => {
+        this.saveNode(existingNode)
+        this.checkMoreElementsToDisplay(existingNode)
         this.saveView()
     }
 
-    onNodePositionUpdated = (nodeId: string, position: GraphPosition) => {
-        let nodes = this.state.nodes
-        let node = nodes.get(nodeId)
-
+    /**
+     * Update the position of a node
+     * @param nodeId - id of the node
+     * @param position - new position
+     */
+    fromGraphPositionUpdated = (nodeId: string, position: GraphPosition) => {
+        let node = this.state.this.getNode(nodeId)
         node.position = position
-        nodes.set(nodeId, node)
-
-        this.state.nodes = nodes
+        this.saveNode(node)
         this.saveView()
     }
 
-    handleAddNewNode = (state: DialogNewNodeState) => {
-        let nodes = this.state.nodes
+    /**
+     * Add a new node from the 'new node' dialog and forward the state of the dialog to the external model
+     * @param state
+     */
+    fromDialogNewNode = (state: DialogNewNodeState) => {
         let node = state.node
-        node.visibility = VISIBILITY.VISIBLE
-        nodes.set(node.data.id, node)
+        this.showNode(node)
 
-
-        this.state.nodes = nodes
+        /** Make sure the dialog will close */
         this.state.dialogNewNodeOpen = false
 
         this.saveView()
         this.props.operationService.createNodeFromDialogState(state)
-        this.forceUpdate()
     }
 
-    handleAddExistingNode = (state: DialogNewNodeState) => {
+    /**
+     * Add a existing node to the view - created through the core context menu
+     * @param nodeId
+     */
+    fromMenuExistingNode = (nodeId: string) => {
         let nodes = this.state.nodes
-        let links = this.state.links
 
-        let node = state.node
-        node.visibility = VISIBILITY.VISIBLE
-        nodes.set(node.data.id, node)
-
-        links.forEach((link) => {
-            if (link.data.source == state.node.data.id) {
-                link.visibility = VISIBILITY.VISIBLE
-
-                let targetNode = nodes.get(link.data.target)
-                targetNode.visibility = VISIBILITY.VISIBLE
-                nodes.set(targetNode.data.id, targetNode)
-
-                links.forEach((targetLink) => {
-                    if (targetLink.data.source == targetNode.data.id && nodes.get(targetLink.data.target).visibility.value == VISIBILITY.VISIBLE.value) {
-                        targetLink.visibility = VISIBILITY.VISIBLE
-                    }
-                    if (targetLink.data.target == targetNode.data.id && nodes.get(targetLink.data.source).visibility.value == VISIBILITY.VISIBLE.value) {
-                        targetLink.visibility = VISIBILITY.VISIBLE
-                    }
-                })
-            }
-            if (link.data.source == node.data.id && nodes.get(link.data.target).visibility.value == VISIBILITY.VISIBLE.value) {
-                link.visibility = VISIBILITY.VISIBLE
-            }
-            if (link.data.target == node.data.id && nodes.get(link.data.source).visibility.value == VISIBILITY.VISIBLE.value) {
-                link.visibility = VISIBILITY.VISIBLE
-            }
-        })
-
-        this.state.nodes = nodes
-        this.state.links = links
-        this.state.dialogSearchNodeOpen = false
-        this.saveView()
-    }
-
-    handleAddExistingNodeFromMenu = (nodeId: string) => {
-        let nodes = this.state.nodes
-        let links = this.state.links
-
-        let node = nodes.get(nodeId)
-        node.visibility = VISIBILITY.VISIBLE
+        /** Make node visible and update position */
+        let node = this.getNode(nodeId)
         node.position = this.state.tappedPosition
-        nodes.set(node.data.id, node)
+        this.showNode(node)
 
-        links.forEach((link) => {
-            if (link.data.source == node.data.id) {
-                link.visibility = VISIBILITY.VISIBLE
+        this.checkMoreElementsToDisplay(node)
 
-                let targetNode = nodes.get(link.data.target)
-                targetNode.visibility = VISIBILITY.VISIBLE
-
-                if (targetNode.position.x == 0 && targetNode.position.y == 0) {
-                    targetNode.position = DOMHelperService.calcNodePosition(node.position)
-                }
-
-                nodes.set(targetNode.data.id, targetNode)
-
-                links.forEach((targetLink) => {
-                    if (targetLink.data.source == targetNode.data.id && nodes.get(targetLink.data.target).visibility.value == VISIBILITY.VISIBLE.value) {
-                        targetLink.visibility = VISIBILITY.VISIBLE
-                    }
-                    if (targetLink.data.target == targetNode.data.id && nodes.get(targetLink.data.source).visibility.value == VISIBILITY.VISIBLE.value) {
-                        targetLink.visibility = VISIBILITY.VISIBLE
-                    }
-                })
-            }
-            if (link.data.source == node.data.id && nodes.get(link.data.target).visibility.value == VISIBILITY.VISIBLE.value) {
-                link.visibility = VISIBILITY.VISIBLE
-            }
-            if (link.data.target == node.data.id && nodes.get(link.data.source).visibility.value == VISIBILITY.VISIBLE.value) {
-                link.visibility = VISIBILITY.VISIBLE
-            }
-        })
-
-        this.state.nodes = nodes
-        this.state.links = links
+        /** Make sure the menu will close */
         this.state.coreContextMenuOpen = false
         this.saveView()
     }
 
-
-    handleAddNewNodeWithLink = (state: DialogNewNodeToConnectState) => {
-        let nodes = this.state.nodes
+    /**
+     * Add a new node from the dialog and connect it to a node
+     * @param state - dialog state
+     */
+    fromDialogNewNodeToConnect = (state: DialogNewNodeToConnectState) => {
+        /** Save new node and link */
         let node = GraphElementFactory.getGraphElementAsNode(state.link.data.target, new GraphPosition(this.state.tappedPosition.x + 10, this.state.tappedPosition.y + 10), VISIBILITY.VISIBLE)
-        nodes.set(node.data.id, node)
+        this.saveNode(node)
 
-        let links = this.state.links
         let link = state.link
-        links.set(link.data.id, link)
+        this.saveLink(link)
 
-
-        this.state.nodes = nodes
-        this.state.links = links
+        /** Make sure the dialog will close */
         this.state.dialogNewNodeToConnectOpen = false
 
         this.saveView()
 
+        /** Update the external model */
         this.props.operationService.createNodeWithLinkFromDialogState(state)
-
-        this.forceUpdate()
     }
 
-    handleAddExistingNodeWithLink = (state: DialogNodeSearchToConnectState) => {
-        let nodes = this.state.nodes
+    /**
+     * Add a existing node from a dialog and connect it to a node
+     * @param state - dialog state
+     */
+    fromDialogExistingNodeToConnect = (state: DialogNodeSearchToConnectState) => {
+        /** Save new node and link */
         let node = GraphElementFactory.getNode(
-            nodes.get(state.link.target).data, new GraphPosition(this.state.tappedPosition.x + 40, this.state.tappedPosition.y + 40), VISIBILITY.VISIBLE)
+            this.state.this.getNode(state.link.target).data, new GraphPosition(this.state.tappedPosition.x + 40, this.state.tappedPosition.y + 40), VISIBILITY.VISIBLE)
+        this.saveNode(node)
 
-        nodes.set(node.data.id, node)
-
-        let links = this.state.links
         let link = GraphElementFactory.getGraphElementAsLink(
             this.props.identityService.createNewLinkId(), this.state.tappedNode.id, state.link.target, VISIBILITY.VISIBLE)
+        this.saveLink(link)
 
-        links.set(link.data.id, link)
-
-        this.state.nodes = nodes
-        this.state.links = links
+        /** Make sure the dialog will close */
         this.state.dialogSearchNodeToConnectOpen = false
 
         this.saveView()
+        /** Update the external model */
         this.props.operationService.createLink(state.link.id, this.state.tappedNode.id, state.link.target, state.nodeName)
-
-        this.forceUpdate()
     }
 
-    /*handleDeleteNodeMobile = (element: any) => {
-     this.handleDeleteNode(element.data().id)
-     }*/
-
-    handleDeleteNodeFromMenu = () => {
-        this.handleDeleteNode(this.state.tappedNode.id)
+    /**
+     * Hide node command from menu
+     */
+    fromMenuHideNode = () => {
+        this.hideNodeAndHisLinks(this.state.tappedNode.id)
     }
 
-    handleDeleteNode = (id: string) => {
+    /**
+     * Hide specific node
+     * @param id
+     */
+    hideNodeAndHisLinks = (id: string) => {
         let nodes = this.state.nodes
         let links = this.state.links
 
-        let node = nodes.get(id)
-        node.visibility = VISIBILITY.HIDDEN
+        /** Hide node */
+        let node = this.getNode(id)
+        this.hideNode(node)
 
-        nodes.set(node.data.id, node)
-
+        /** Hide links */
         links.forEach((link) => {
             if (link.data.source == id || link.data.target == id) {
-                link.visibility = VISIBILITY.HIDDEN
+                this.hideLink(link)
             }
         })
 
-        this.state.nodes = nodes
-        this.state.links = links
         this.saveView()
     }
 
-    /*handleOpenDialogEditNode = (element: any) => {
-     console.log(element)
-     this.props.onNodeDetailRequest(element.id())
-     /*this.setState({
-     dialogEditNodeOpen: true,
-     nodeToEdit: element.data()
-     })
-     }*/
-
-    handleCloseDialogNewNode = () => {
+    /**
+     * Close the 'new node' dialog
+     */
+    closeNewNodeDialog = () => {
         this.setState({
             dialogNewNodeOpen: false
         })
     }
 
-    handleOpenDialogNewNode = (element: any) => {
+    /**
+     * Open the 'new node' dialog, also close all open menus and save the tapped position
+     */
+    openNewNodeDialog = (element: any) => {
         this.setState({
             dialogNewNodeOpen: true,
             nodeContextMenuOpen: false,
@@ -334,39 +334,19 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         })
     }
 
-    handleCloseDialogSearchNode = () => {
-        this.setState({
-            dialogSearchNodeOpen: false
-        }, () => {
-            this.saveView()
-        })
-    }
-
-    /*handleOpenDialogSearchNode = (element: any) => {
-     this.setState({
-     dialogSearchNodeOpen: true,
-     nodeContextMenuOpen: false,
-     coreContextMenuOpen: false,
-     tappedPosition: element.position
-     })
-     }*/
-
-    handleOpenDialogSearchNode = () => {
-        this.setState({
-            nodeContextMenuOpen: false,
-            coreContextMenuOpen: false,
-            dialogSearchNodeOpen: true
-        })
-    }
-
-
-    handleCloseDialogNewNodeToConnect = () => {
+    /**
+     * Close the 'new node and connect to existing node' dialog
+     */
+    closeNewNodeToConnectDialog = () => {
         this.setState({
             dialogNewNodeToConnectOpen: false
         })
     }
 
-    handleOpenDialogNewNodeToConnect = (element: any) => {
+    /**
+     * Open the 'new node and connect to existing node' dialog, also close all open menus and save the tapped position and tapped node
+     */
+    openNewNodeToConnectDialog = (element: any) => {
         this.setState({
             nodeContextMenuOpen: false,
             coreContextMenuOpen: false,
@@ -376,23 +356,19 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         })
     }
 
-    handleCloseDialogSearchNodeToConnect = () => {
+    /**
+     * Close the 'search node and connect to existing node' dialog
+     */
+    closeSearchNodeToConnectDialog = () => {
         this.setState({
             dialogSearchNodeToConnectOpen: false
         })
     }
 
-    /*handleOpenDialogSearchNodeToConnect = (element: any) => {
-     this.setState({
-     nodeContextMenuOpen: false,
-     coreContextMenuOpen: false,
-     dialogSearchNodeToConnectOpen: true,
-     tappedPosition: element.position(),
-     tappedNode: element.data()
-     })
-     }*/
-
-    handleOpenDialogSearchNodeToConnect = () => {
+    /**
+     * Open the 'search node and connect to existing node' dialog, also close all open menus
+     */
+    openSearchNodeToConnectDialog = () => {
         this.setState({
             nodeContextMenuOpen: false,
             coreContextMenuOpen: false,
@@ -400,58 +376,44 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         })
     }
 
-    /*handleLinksCollapse(elements: GraphLinkData[]) {
-     let links = this.state.links
-     let nodes = this.state.nodes
-
-     elements.forEach((element) => {
-     let link = links.get(element.id)
-     link.visibility = VISIBILITY.HIDDEN
-     links.set(link.data.id, link)
-
-
-     //console.log(this.getNumberOfTargetLinksForNode(element.target))
-     if (this.getNumberOfLinksForNode(element.target) == 0) {
-     let node = nodes.get(element.target)
-     node.visibility = VISIBILITY.HIDDEN
-     }
-     })
-
-     this.state.nodes = nodes
-     this.state.links = links
-     this.state.nodeContextMenuOpen = false
-     this.state.coreContextMenuOpen = false
-     this.saveView()
-     }*/
-
-
-    handleNodeCollapseFromMenu() {
+    /**
+     * Collapse a node from context menu
+     */
+    fromMenuCollapseNode() {
+        /** Make sure menu closes */
         this.hideNodeMenu()
         this.handleNodeCollapse(this.state.tappedNode.id)
     }
 
+    /**
+     * Collapse node
+     * @param nodeId - node id
+     */
     handleNodeCollapse(nodeId: string) {
         let links = this.state.links
         let nodes = this.state.nodes
 
-        let node = nodes.get(nodeId)
-        node.visibility = VISIBILITY.HIDDEN
-        nodes.set(nodeId, node)
+        /** Hide node */
+        let node = this.getNode(nodeId)
+        this.hideNode(node)
 
+        /** Hide links */
         links.forEach((link) => {
             if (link.data.source == nodeId) {
-                link.visibility = VISIBILITY.HIDDEN
+                this.hideLink(link)
             } else if (link.data.target == nodeId) {
-                link.visibility = VISIBILITY.HIDDEN
-
+                this.hideLink(link)
             }
         })
 
-        this.state.nodes = nodes
-        this.state.links = links
         this.saveView()
     }
 
+    /**
+     * Get number of links with the certain node as target node
+     * @param nodeId
+     * @return {number}
+     */
     getNumberOfTargetLinksForNode(nodeId: string): number {
         var counter = 0
         this.state.links.forEach((link) => {
@@ -462,6 +424,11 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         return counter
     }
 
+    /**
+     * Get number of links with the certain node either as target node or source node
+     * @param nodeId
+     * @return {number}
+     */
     getNumberOfLinksForNode(nodeId: string): number {
         var counter = 0
         this.state.links.forEach((link) => {
@@ -475,75 +442,85 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         return counter
     }
 
-    handleExpandLinkFromMenu(linkId: string) {
+    /**
+     * Expand one link
+     * @param linkId
+     */
+    fromMenuExpandLink(linkId: string) {
         let links = this.state.links
         let nodes = this.state.nodes
 
-        let linkToExpand = links.get(linkId)
-        linkToExpand.visibility = VISIBILITY.VISIBLE
-        links.set(linkToExpand.data.id, linkToExpand)
+        /** Make link visible */
+        let linkToExpand = this.getLink(linkId)
+        this.showLink(linkToExpand)
 
-        let targetNode = nodes.get(linkToExpand.data.target)
+        /** Make node visible */
+        let targetNode = this.getNode(linkToExpand.data.target)
         if (targetNode.position.x == 0 && targetNode.position.y == 0) {
             targetNode.position = DOMHelperService.calcNodePosition(this.state.tappedPosition)
         }
-        targetNode.visibility = VISIBILITY.VISIBLE
-        nodes.set(targetNode.data.id, targetNode)
-
-
-        this.setState({
-            nodes: nodes,
-            links: links
-        }, () => {
-            this.saveView()
-        })
-
+        this.showNode(targetNode)
+        
+        this.saveView()
     }
 
-    handleExpandAllFromMenu() {
+    /**
+     * Expand all links from the tapped node
+     */
+    fromMenuExpandAll() {
         let links = this.state.links
         let nodes = this.state.nodes
         let nodeId = this.state.tappedNode.id
 
         links.forEach((link) => {
+            /** Make all links and nodes visible with the tapped node as source*/
             if (link.data.source == nodeId && link.visibility == VISIBILITY.HIDDEN) {
-                link.visibility = VISIBILITY.VISIBLE
+                this.showLink(link)
+                
 
-                let node = nodes.get(link.data.target)
-                node.visibility = VISIBILITY.VISIBLE
+                let node = this.getNode(link.data.target)
                 if (node.position.x == 0 && node.position.y == 0) {
                     node.position = DOMHelperService.calcNodePosition(this.state.tappedPosition)
                 }
-                nodes.set(node.data.id, node)
+                this.showNode(node)
             }
         })
 
-        this.state.nodes = nodes
-        this.state.links = links
+        /** Make sure all menus close */
         this.state.nodeContextMenuOpen = false
         this.state.coreContextMenuOpen = false
         this.saveView()
     }
 
-    handleNodeDetailRequested = () => {
+    /**
+     * Forward the request to display the node detail of the tapped node
+     * Will called either from the menu or the graph
+     */
+    nodeDetailRequested = () => {
         this.hideNodeMenu()
         this.props.onNodeDetailRequest(this.state.tappedNode.id)
     }
 
-
+    /** Display the core context menu on a certain position */
     showCoreContextMenu(position: GraphPosition) {
         this.state.tappedPosition = position
-
         this.showCoreMenu()
     }
 
+    /** Display the node context menu over a certain node */
     showNodeContextMenu(node: GraphNodeElement) {
+
+        /** Save node information for further menu operations*/
         this.state.tappedNode = node.data
         this.state.tappedPosition = node.position
 
         this.showNodeMenu();
     }
 
+    /**
+     * Save the current view and forward to the external package to save
+     * This has to trigger a reload of this component
+     */
     saveView = () => {
         let view = ViewFactory.viewFromMaps(this.state.nodes, this.state.links, this.props.viewToLoad.title)
         view.id = this.props.viewToLoad.id
@@ -552,30 +529,41 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
     }
 
 
+    /** Show core context menu and hide the node context menu*/
     showCoreMenu = () => {
         this.setState({
             coreContextMenuOpen: true,
             nodeContextMenuOpen: false
         })
     }
+
+    /** Hide core context menu */
     hideCoreMenu = () => {
         this.setState({
             coreContextMenuOpen: false
         })
     }
+
+    /** Show node context menu and hide the core context menu*/
     showNodeMenu = () => {
         this.setState({
             nodeContextMenuOpen: true,
             coreContextMenuOpen: false
         })
     }
+
+    /** Show node context menu */
     hideNodeMenu = () => {
         this.setState({
             nodeContextMenuOpen: false
         })
     }
 
-    handleNewNodeFromMenu = (type: GraphNodeType) => {
+    /**
+     * Save the type of the new node and open the 'new node' dialog
+     * @param type
+     */
+    fromMenuNewNodeDialog = (type: GraphNodeType) => {
         this.hideCoreMenu()
         this.setState({
             newNodeType: type,
@@ -583,7 +571,11 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         })
     }
 
-    handleNewNodeToConnectFromMenu = (type: GraphNodeType) => {
+    /**
+     * Save the type of the new node and open the 'new node and oonnect to exsting node' dialog
+     * @param type
+     */
+    fromMenuNewNodeToConnect = (type: GraphNodeType) => {
         this.hideNodeMenu()
         this.setState({
             newNodeType: type,
@@ -591,85 +583,89 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         })
     }
 
-    onLinkSelected = (e: any) => {
+    /**
+     * If a link is selected add the custom class to the link and open the collapse toolbar
+     * @param e
+     */
+    fromGraphLinkSelected = (e: any) => {
         let links = this.state.links
-        let link = links.get(e.data().id)
-        link.linkClasses.push('selected')
-        links.set(link.data.id, link)
+        let link = this.getLink(e.data().id)
 
-        this.saveView()
+        link.linkClasses.push('selected')
+        this.saveLink(link)
 
         this.setState({
-            links: links,
             collapseToolbarNeeded: true
         })
     }
 
-    handleClickOnCollapse = () => {
+
+    fromToolbarCollapseSelectedLinks = () => {
         let links = this.state.links
         let nodes = this.state.nodes
 
+        /** Hide the links and remove the custom class */
         links.forEach((link) => {
             let indexOfClass = link.linkClasses.indexOf('selected')
             if (indexOfClass >= 0) {
-                link.visibility = VISIBILITY.HIDDEN
                 link.linkClasses.splice(indexOfClass, 1)
+                this.hideLink(link)
 
                 if (this.getNumberOfLinksForNode(link.data.target) == 0) {
-                    let targetNode = nodes.get(link.data.target)
-                    targetNode.visibility = VISIBILITY.HIDDEN
-                    nodes.set(targetNode.data.id, targetNode)
+                    let targetNode = this.getNode(link.data.target)
+                    this.hideNode(targetNode)
                 }
             }
 
         })
-
-        this.state.nodes = nodes
-        this.state.links = links
+        /** Make sure the collapse toolbar will hide */
         this.state.collapseToolbarNeeded = false
         this.saveView()
     }
 
 
-    handleCollapseAllFromMenu = () => {
+    fromMenuCollapseAll = () => {
         let links = this.state.links
         let nodes = this.state.nodes
 
+        /** Hide all links with the tapped Node as source */
         links.forEach((link) => {
             if (link.visibility == VISIBILITY.VISIBLE && link.data.source == this.state.tappedNode.id) {
+                this.hideLink(link)
                 link.visibility = VISIBILITY.HIDDEN
 
                 if (this.getNumberOfLinksForNode(link.data.target) == 0) {
-                    let targetNode = nodes.get(link.data.target)
-                    targetNode.visibility = VISIBILITY.HIDDEN
-                    nodes.set(targetNode.data.id, targetNode)
-
+                    let targetNode = this.getNode(link.data.target)
+                    this.hideNode(targetNode)
                 }
             }
         })
 
-        this.state.nodes = nodes
-        this.state.links = links
+        /** Make sure all menus will close */
         this.state.nodeContextMenuOpen = false
         this.state.coreContextMenuOpen = false
         this.saveView()
     }
 
+    /** Hide link labels */
     hideLinkLabels = () => {
         this.setState({
             showLabels: false
         })
     }
 
+    /** Hide show labels */
     showLinkLabels = () => {
         this.setState({
             showLabels: true
         })
     }
 
-    render() {
-        this.initState()
-
+    /**
+     * Process all nodes to forward it to the graph => just send visible ones
+     * @return {GraphNodeElement[]}
+     */
+    processNodesForGraph = () => {
         let nodes: GraphNodeElement[] = []
         this.state.nodes.forEach((node) => {
             if (node.visibility.value == VISIBILITY.VISIBLE.value) {
@@ -677,7 +673,14 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
                 nodes.push(node)
             }
         })
+        return nodes
+    }
 
+    /**
+     * Process all links to forward it to the graph => just send visible ones and may add labels
+     * @return {GraphLinkElement[]}
+     */
+    processLinksForGraph = () => {
         let links: GraphLinkElement[] = []
 
         if (this.state.showLabels) {
@@ -695,7 +698,46 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
                 }
             })
         }
+        return links
+    }
 
+    /**
+     * Process nodes for context menus => add all titles to them
+     * @return {GraphNodeData[]}
+     */
+    processNodesForContextMenu = () => {
+        let nodes: GraphNodeData[] = []
+
+        this.state.nodes.forEach((node) => {
+            node.data.label = this.props.nodeInformationProvider.getNodeTitle(node.data.id)
+            nodes.push(node.data)
+        })
+
+        return nodes
+    }
+
+    /**
+     * Process links for the node context menu => add all label to them
+     * @return {GraphLinkData[]}
+     */
+    processLinksForNodeContextMenu = () => {
+        let links: GraphLinkData[] = []
+
+        this.state.links.forEach((link) => {
+            if (link.data.source == this.state.tappedNode.id && link.visibility.value == VISIBILITY.HIDDEN.value) {
+                link.data.label = this.props.nodeInformationProvider.getLinkLabel(link.data.source, link.data.id)
+                links.push(link.data)
+            }
+        })
+
+        return links
+    }
+
+    render() {
+        this.initState()
+
+        let nodes: GraphNodeElement[] = this.processNodesForGraph()
+        let links: GraphLinkElement[] = this.processLinksForGraph()
 
         return (
             <div>
@@ -703,15 +745,15 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
                     <Graph
                         nodes={nodes}
                         links={links}
-                        onNewNode={this.onNodeCreated.bind(this)}
-                        onNewLink={this.onLinkCreated.bind(this)}
-                        onNodePositionUpdate={this.onNodePositionUpdated.bind(this)}
+                        onNewNode={this.fromGraphExistingNode.bind(this)}
+                        onNewLink={this.fromGraphNewLink.bind(this)}
+                        onNodePositionUpdate={this.fromGraphPositionUpdated.bind(this)}
                         onCoreContextMenuRequested={this.showCoreContextMenu.bind(this)}
                         onNodeContextMenuRequested={this.showNodeContextMenu.bind(this)}
-                        onLinkSelected={this.onLinkSelected.bind(this)}
+                        onLinkSelected={this.fromGraphLinkSelected.bind(this)}
                         onNodeDetailRequest={(node:GraphNodeData)=>{
                                         this.state.tappedNode = node
-                                        this.handleNodeDetailRequested()
+                                        this.nodeDetailRequested()
                                     }}
                         identityService={this.props.identityService}
                     />
@@ -720,12 +762,7 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
 
                 {(() => {
                     if (this.state.coreContextMenuOpen) {
-                        let nodes: GraphNodeData[] = []
-
-                        this.state.nodes.forEach((node) => {
-                            node.data.label = this.props.nodeInformationProvider.getNodeTitle(node.data.id)
-                            nodes.push(node.data)
-                        })
+                        let nodes: GraphNodeData[] = this.processNodesForContextMenu()
 
                         return (
                             <CoreContextMenu
@@ -734,8 +771,8 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
                                 graphNodeTypes={this.props.nodeTypes}
                                 requestClose={this.hideCoreMenu.bind(this)}
                                 searchFieldFactory={this.props.searchFieldFactory}
-                                onNewNode={this.handleNewNodeFromMenu.bind(this)}
-                                onExistingNode={this.handleAddExistingNodeFromMenu.bind(this)}
+                                onNewNode={this.fromMenuNewNodeDialog.bind(this)}
+                                onExistingNode={this.fromMenuExistingNode.bind(this)}
                             />
                         )
                     }
@@ -743,19 +780,8 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
 
                 {(() => {
                     if (this.state.nodeContextMenuOpen) {
-                        let nodes: GraphNodeData[] = []
-                        let links: GraphLinkData[] = []
-
-                        this.state.nodes.forEach((node) => {
-                            node.data.label = this.props.nodeInformationProvider.getNodeTitle(node.data.id)
-                            nodes.push(node.data)
-                        })
-                        this.state.links.forEach((link) => {
-                            if (link.data.source == this.state.tappedNode.id && link.visibility.value == VISIBILITY.HIDDEN.value) {
-                                link.data.label = this.props.nodeInformationProvider.getLinkLabel(link.data.source, link.data.id)
-                                links.push(link.data)
-                            }
-                        })
+                        let nodes: GraphNodeData[] = this.processNodesForContextMenu()
+                        let links: GraphLinkData[] = this.processLinksForNodeContextMenu()
 
                         return (
                             <NodeContextMenu
@@ -763,14 +789,14 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
                                 links={links}
                                 position={this.state.tappedPosition}
                                 graphNodeTypes={this.props.nodeTypes}
-                                requestClose={this.hideCoreMenu.bind(this)}
-                                onEditNode={this.handleNodeDetailRequested.bind(this)}
-                                onHideNode={this.handleNodeCollapseFromMenu.bind(this)}
-                                onExpandAll={this.handleExpandAllFromMenu.bind(this)}
-                                onExpandNode={this.handleExpandLinkFromMenu.bind(this)}
-                                onCollapseAll={this.handleCollapseAllFromMenu.bind(this)}
-                                onNewNodeToConnect={this.handleNewNodeToConnectFromMenu.bind(this)}
-                                onExistingNodeToConnect={this.handleOpenDialogSearchNodeToConnect.bind(this)}
+                                requestClose={this.hideNodeMenu.bind(this)}
+                                onEditNode={this.nodeDetailRequested.bind(this)}
+                                onHideNode={this.fromMenuCollapseNode.bind(this)}
+                                onExpandAll={this.fromMenuExpandAll.bind(this)}
+                                onExpandNode={this.fromMenuExpandLink.bind(this)}
+                                onCollapseAll={this.fromMenuCollapseAll.bind(this)}
+                                onNewNodeToConnect={this.fromMenuNewNodeToConnect.bind(this)}
+                                onExistingNodeToConnect={this.openSearchNodeToConnectDialog.bind(this)}
                                 searchFieldFactory={this.props.searchFieldFactory}
                             />
                         )
@@ -782,8 +808,8 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
                         return (
                             this.props.dialogFactory.getDialogNodeNewNode(
                                 this.state.dialogNewNodeOpen,
-                                this.handleAddNewNode.bind(this),
-                                this.handleCloseDialogNewNode.bind(this),
+                                this.fromDialogNewNode.bind(this),
+                                this.closeNewNodeDialog.bind(this),
                                 GraphElementFactory.getGraphElementAsNode(this.props.identityService.createNewNodeId(), this.state.tappedPosition, VISIBILITY.VISIBLE),
                                 this.state.newNodeType
                             )
@@ -793,24 +819,17 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
                         return (
                             this.props.dialogFactory.getDialogNodeNewNodeToConnect(
                                 this.state.dialogNewNodeToConnectOpen,
-                                this.handleAddNewNodeWithLink.bind(this),
-                                this.handleCloseDialogNewNodeToConnect.bind(this),
+                                this.fromDialogNewNodeToConnect.bind(this),
+                                this.closeNewNodeToConnectDialog.bind(this),
                                 GraphElementFactory.getGraphElementAsLink(this.props.identityService.createNewLinkId(), this.state.tappedNode.id, this.props.identityService.createNewNodeId(), VISIBILITY.VISIBLE),
                                 this.state.newNodeType
-                            )
-                        )
-                    }
-                    if (this.state.dialogSearchNodeOpen) {
-                        return (
-                            this.props.dialogFactory.getDialogNodeSearch(
-                                this.state.dialogSearchNodeOpen, this.handleAddExistingNode.bind(this), this.handleCloseDialogSearchNode.bind(this)
                             )
                         )
                     }
                     if (this.state.dialogSearchNodeToConnectOpen) {
                         return (
                             this.props.dialogFactory.getDialogNodeSearchToConnect(
-                                this.state.dialogSearchNodeToConnectOpen, this.handleAddExistingNodeWithLink.bind(this), this.handleCloseDialogSearchNodeToConnect.bind(this)
+                                this.state.dialogSearchNodeToConnectOpen, this.fromDialogExistingNodeToConnect.bind(this), this.closeSearchNodeToConnectDialog.bind(this)
                             )
                         )
                     }
@@ -822,7 +841,7 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
                             return (
                                 <FlatButton
                                     label='COLLAPSE'
-                                    onTouchTap={this.handleClickOnCollapse.bind(this)}
+                                    onTouchTap={this.fromToolbarCollapseSelectedLinks.bind(this)}
                                 />
                             )
                         }
