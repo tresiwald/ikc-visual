@@ -64,6 +64,8 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
 
                 /** Update the pan value*/
                 pan: this.state.pan,
+                zoomingEnabled: false,
+                userZoomingEnabled: false,
 
                 /** Setup the layout */
                 layout: {
@@ -88,11 +90,12 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
                         style: {
                             'width': 1,
                             'label': 'data(label)',
+                            'color': '#38435c',
                             'target-arrow-shape': 'triangle',
                             'line-color': '#9dbaea',
                             'target-arrow-color': '#9dbaea',
                             'curve-style': 'bezier',
-                            'control-point-step-size': 5,
+                            'control-point-step-size': 10,
                             'edge-text-rotation': 'autorotate'
                         }
                     }, {
@@ -174,7 +177,8 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
                 /** Initiate new link creation */
                 if (targetNode.id()) {
                     console.log("add link between" + node.id() + " and " + targetNode.id());
-
+                    let id = that.props.identityService.createNewLinkId()
+                    console.log(id)
                     /** Create new link and send it for further processing */
                     that.props.onNewLink(
                         GraphElementFactory.getGraphElementAsLink(that.props.identityService.createNewLinkId(), node.id(), targetNode.id(), VISIBILITY.VISIBLE),
@@ -194,8 +198,8 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
 
         });
 
-        /** Register event to listen 'click' events on edges */
-        this.cy.edges().on('click', function (e: any) {
+        /** Register event to listen 'tap' events on edges */
+        this.cy.edges().on('tap', function (e: any) {
             that.props.onLinkSelected(e.cyTarget)
         })
 

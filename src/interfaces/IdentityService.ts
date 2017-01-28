@@ -6,11 +6,11 @@ export interface IdentityService {
     /**
      * Create new node id
      */
-    createNewNodeId(): any
+    createNewNodeId(): string
 
 
     /**
      * Create new link id
      */
-    createNewLinkId(): any
+    createNewLinkId(): string
 }

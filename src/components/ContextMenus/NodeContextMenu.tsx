@@ -48,13 +48,17 @@ export default class NodeContextMenu extends React.Component<NodeContextMenuProp
      * Before the component will mount, a event listener will be registered on the 'click' event. If there is a 'click' event
      * outside the context menu, it will disappear
      */
-    componentWillMount = () => {
-        let that = this
-        document.addEventListener('click', this.checkCloseNeeded.bind(this))
-        document.addEventListener('touchstart', this.checkCloseNeeded.bind(this))
+
+    componentDidMount = () => {
+        document.onclick = this.checkCloseNeeded.bind(this)
+        document.ontouchstart = this.checkCloseNeeded.bind(this)
+
+        /**  Adjust element after the component did mount */
+        this.adjustElement()
     }
 
     checkCloseNeeded = (e:any) => {
+        e.preventDefault()
         var elementMouseIsOver = null
         if (e.type == 'click') {
             elementMouseIsOver = document.elementFromPoint(e.clientX, e.clientY);
@@ -64,22 +68,12 @@ export default class NodeContextMenu extends React.Component<NodeContextMenuProp
         if (DOMHelperService.isDescendant(document.getElementById('nodeContextMenu'), elementMouseIsOver)) {
             console.log(elementMouseIsOver)
         } else {
+            document.onclick = null
+            document.ontouchstart = null
             this.props.requestClose()
         }
     }
 
-    componentWillUnmount = () => {
-        document.removeEventListener('click', this.checkCloseNeeded)
-        document.removeEventListener('touchstart', this.checkCloseNeeded)
-
-    }
-
-    /**
-     * Adjust element after the component did mount
-     */
-    componentDidMount = () => {
-        this.adjustElement()
-    }
 
     /**
      * Adjust element after the component did update

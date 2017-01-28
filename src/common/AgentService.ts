@@ -44,6 +44,6 @@ export module AgentService {
      * @returns {boolean}
      */
     export function agentIsTabletLandscape():boolean {
-        return this.TabletLandscape()
+        return this.tabletLandscape()
     }
 }

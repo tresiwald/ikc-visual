@@ -49,6 +49,7 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
                 links.set(link.data.id, link)
             )
 
+
             this.state.nodes = nodes
             this.state.links = links
         }
@@ -77,7 +78,11 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
      * @return {GraphNodeElement}
      */
     getNode = (nodeId:string) => {
-        return this.state.nodes.get(nodeId)
+        let node = this.state.nodes.get(nodeId)
+        if(node == undefined){
+            console.log(nodeId + 'undefined')
+        }
+        return node
     }
 
     /**
@@ -133,9 +138,12 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         let links = this.state.links
         let nodes = this.state.nodes
 
+        /** Make sure not more than 7 links are displayed  */
+        var counter = 0
         links.forEach((link) => {
             /** Make all children visible and their link to the new node */
-            if (link.data.source == sourceNode.data.id) {
+            if (link.data.source == sourceNode.data.id && counter < 7) {
+                counter = counter + 1
                 this.showLink(link)
 
                 /** Calculate new position for child node and make it visible*/
@@ -174,6 +182,7 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
     fromGraphNewLink = (newLink: GraphLinkElement, oldSourcePosition: GraphPosition) => {
         /** Save link */
         this.saveLink(newLink)
+
 
         /** Update source node to old position */
         this.fromGraphPositionUpdated(newLink.data.source, oldSourcePosition)
@@ -270,6 +279,7 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
 
         let link = GraphElementFactory.getGraphElementAsLink(
             this.props.identityService.createNewLinkId(), this.state.tappedNode.id, state.link.target, VISIBILITY.VISIBLE)
+
         this.saveLink(link)
 
         /** Make sure the dialog will close */
@@ -300,8 +310,16 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
 
         /** Hide links */
         links.forEach((link) => {
-            if (link.data.source == id || link.data.target == id) {
+            if (link.data.source == id) {
                 this.hideLink(link)
+                if(this.getNumberOfLinksForNode(link.data.target) == 0){
+                    this.hideNode(this.getNode(link.data.target))
+                }
+            }else if (link.data.target == id) {
+                this.hideLink(link)
+                if(this.getNumberOfLinksForNode(link.data.source) == 0){
+                    this.hideNode(this.getNode(link.data.source))
+                }
             }
         })
 
@@ -395,8 +413,14 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         links.forEach((link) => {
             if (link.data.source == nodeId) {
                 this.hideLink(link)
-            } else if (link.data.target == nodeId) {
+                if(this.getNumberOfLinksForNode(link.data.target) == 0){
+                    this.hideNode(this.getNode(link.data.target))
+                }
+            }else if (link.data.target == nodeId) {
                 this.hideLink(link)
+                if(this.getNumberOfLinksForNode(link.data.source) == 0){
+                    this.hideNode(this.getNode(link.data.source))
+                }
             }
         })
 
@@ -454,7 +478,7 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
             targetNode.position = DOMHelperService.calcNodePosition(this.state.tappedPosition)
         }
         this.showNode(targetNode)
-        
+
         this.saveView()
     }
 
@@ -470,7 +494,7 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
             /** Make all links and nodes visible with the tapped node as source*/
             if (link.data.source == nodeId && link.visibility == VISIBILITY.HIDDEN) {
                 this.showLink(link)
-                
+
 
                 let node = this.getNode(link.data.target)
                 if (node.position.x == 0 && node.position.y == 0) {
@@ -585,15 +609,44 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         let links = this.state.links
         let link = this.getLink(e.data().id)
 
-        link.linkClasses.push('selected')
-        this.saveLink(link)
+        let indexOfClass = link.linkClasses.indexOf('selected')
+        if(indexOfClass == -1){
 
-        this.setState({
-            collapseToolbarNeeded: true
-        })
+            /** Add custom class */
+            link.linkClasses.push('selected')
+            this.saveLink(link)
+            this.setState({
+                collapseToolbarNeeded: true
+            })
+        }else{
+
+            /** Remove custom class */
+            link.linkClasses.splice(indexOfClass,1)
+            this.saveLink(link)
+
+            /** Check if collapse toolbar still needed */
+            let lastSelectedLink = true
+            links.forEach((link) => {
+                let index = link.linkClasses.indexOf('selected')
+                if(index != -1){
+                    lastSelectedLink = false
+                }
+            })
+            if(lastSelectedLink){
+                this.setState({
+                    collapseToolbarNeeded: false
+                })
+            }else{
+                this.setState({
+                    collapseToolbarNeeded: true
+                })
+            }
+        }
     }
 
-
+    /**
+     * Collapse all
+     */
     fromToolbarCollapseSelectedLinks = () => {
         let links = this.state.links
         let nodes = this.state.nodes
@@ -606,8 +659,7 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
                 this.hideLink(link)
 
                 if (this.getNumberOfLinksForNode(link.data.target) == 0) {
-                    let targetNode = this.getNode(link.data.target)
-                    this.hideNode(targetNode)
+                    this.hideNode(this.getNode(link.data.target))
                 }
             }
 
@@ -617,7 +669,9 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         this.saveView()
     }
 
-
+    /**
+     * Collapse all children
+     */
     fromMenuCollapseAll = () => {
         let links = this.state.links
         let nodes = this.state.nodes
@@ -629,16 +683,18 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
                 link.visibility = VISIBILITY.HIDDEN
 
                 if (this.getNumberOfLinksForNode(link.data.target) == 0) {
-                    let targetNode = this.getNode(link.data.target)
-                    this.hideNode(targetNode)
+                    this.hideNode(this.getNode(link.data.target))
                 }
             }
         })
 
         /** Make sure all menus will close */
-        this.state.nodeContextMenuOpen = false
-        this.state.coreContextMenuOpen = false
-        this.saveView()
+        this.setState({
+            nodeContextMenuOpen: false,
+            coreContextMenuOpen: false
+        }, () => {
+            this.saveView()
+        })
     }
 
     /** Hide link labels */
