@@ -101,7 +101,13 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
                     }, {
                         selector: 'edge.selected',
                         style: {
+                            'width': 1,
+                            'label': 'data(label)',
+                            'color': '#38435c',
                             'target-arrow-shape': 'triangle',
+                            'curve-style': 'bezier',
+                            'control-point-step-size': 10,
+                            'edge-text-rotation': 'autorotate',
                             'line-color': '#CC11AA',
                             'target-arrow-color': '#CC11AA',
                         }
@@ -307,7 +313,7 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
             }
         })
         /**
-         * Create node without new link
+         * Create node 101without new link
          */
         if(!nodeCreated) {
             this.props.onNewNode(
