@@ -1,13 +1,9 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import GraphScreen from "./components/GraphScreen/GraphScreen";
-import {TestNodeInformationProvider} from "./TestNodeInformationProvider";
-import {TestOperationService} from "./TestOperationService";
 import {TimeService} from "./common/TimeService";
-import {TestDialogFactory} from "./TestDialogFactory";
 import {MuiThemeProvider} from "material-ui/styles";
 import {ViewFactory} from "./model/ViewFactory";
-import TestDrag from "./TestDrag";
 import getMuiTheme = __MaterialUI.Styles.getMuiTheme;
 import injectTapEventPlugin = require("react-tap-event-plugin");
 

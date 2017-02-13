@@ -12,7 +12,8 @@
     "types": [
       "typescript",
       "node",
-      "react"
+      "react",
+      "material-ui"
     ]
   },
   "exclude": [
