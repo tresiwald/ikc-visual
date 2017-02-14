@@ -17,7 +17,7 @@ export module ViewFactory {
 
     export function defaultViewFromNodesAndLinksWith(title: string, nodes: GraphNodeElement[], links: GraphLinkElement[]): View {
         let view = new View(title, nodes, links)
-        view.id = '0'
+        view.id = '1'
         return view
     }
 
