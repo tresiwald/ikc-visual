@@ -7,7 +7,6 @@ import {SearchFieldFactory} from "../../interfaces/SearchFieldFactory";
 import {GraphNodeData} from "../../model/GraphNodeData";
 import {AgentService} from "../../common/AgentService";
 
-import render = __React.__DOM.render;
 import getMuiTheme = __MaterialUI.Styles.getMuiTheme;
 import {DOMHelperService} from "../../common/DOMHelperService";
 

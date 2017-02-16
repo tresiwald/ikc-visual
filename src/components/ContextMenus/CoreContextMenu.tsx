@@ -7,7 +7,6 @@ import {SearchFieldFactory} from "../../interfaces/SearchFieldFactory";
 import {AgentService} from "../../common/AgentService";
 import {DOMHelperService} from "../../common/DOMHelperService";
 
-import render = __React.__DOM.render;
 import getMuiTheme = __MaterialUI.Styles.getMuiTheme;
 
 export interface CoreContextMenuProps {
