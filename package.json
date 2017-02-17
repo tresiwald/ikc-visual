@@ -1,8 +1,9 @@
 {
   "name": "ikc-visual",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "",
   "main": "./dist/bundle.js",
+  "typings": "./dist",
   "scripts": {
     "build": "webpack",
     "start": "node server.js",
