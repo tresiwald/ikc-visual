@@ -131,7 +131,9 @@ export default class Graph extends React.Component<GraphProps, GraphState> {
 
             /** Save the current pan value on 'pan' */
             this.cy.on('pan', function (e: any) {
-                that.state.pan = e.cy.pan()
+                that.setState({
+                    pan: e.cy.pan()
+                })
             })
 
             /** Notify to display the core context menu on 'cxttap' (rightclick) on a empty place on the core */

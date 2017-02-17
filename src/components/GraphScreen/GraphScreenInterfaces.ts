@@ -13,7 +13,6 @@ export interface  GraphScreenProps {
     viewToLoad: View;
     nodeInformationProvider: NodeInformationProvider;
     operationService: OperationService;
-    timestamp: string;
     dialogFactory: DialogFactory;
     searchFieldFactory: SearchFieldFactory;
     onNodeDetailRequest: Function;
@@ -24,7 +23,6 @@ export interface  GraphScreenProps {
 export interface  GraphScreenStats {
     nodes?: Map<string, GraphNodeElement>;
     links?: Map<string, GraphLinkElement>;
-    timestamp?: string;
     dialogNewNodeOpen?: boolean;
     dialogSearchNodeOpen?: boolean;
     dialogNewNodeToConnectOpen?: boolean;

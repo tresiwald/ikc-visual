@@ -32,27 +32,22 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
     /**
      * Load the initial state
      */
-    initState = () => {
+    componentWillReceiveProps = (nextProps:GraphScreenProps) => {
+        let nodes = new Map<string, GraphNodeElement>()
+        let links = new Map<string, GraphLinkElement>()
 
-        /** Check if reload is needed */
-        if (this.state.timestamp != this.props.timestamp) {
-            this.state.timestamp = this.props.timestamp
+        /** Fill up the maps */
+        this.props.viewToLoad.nodes.forEach((node) => {
+            nodes.set(node.data.id, node)
+        })
+        this.props.viewToLoad.links.forEach((link) =>
+            links.set(link.data.id, link)
+        )
 
-            /** Fill up the maps */
-            let nodes = new Map<string, GraphNodeElement>()
-            let links = new Map<string, GraphLinkElement>()
-
-            this.props.viewToLoad.nodes.forEach((node) => {
-                nodes.set(node.data.id, node)
-            })
-            this.props.viewToLoad.links.forEach((link) =>
-                links.set(link.data.id, link)
-            )
-
-
-            this.state.nodes = nodes
-            this.state.links = links
-        }
+        this.setState({
+            nodes: nodes,
+            links: links
+        })
     }
     /**
      * Save or update a link
@@ -60,7 +55,7 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
      */
     saveLink = (link:GraphLinkElement) => {
         let links = this.state.links
-        this.state.links.set(link.data.id, link)
+        links.set(link.data.id, link)
     }
 
     /**
@@ -222,11 +217,15 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         let node = state.node
         this.showNode(node)
 
-        /** Make sure the dialog will close */
-        this.state.dialogNewNodeOpen = false
 
         this.saveView()
-        this.props.operationService.createNodeFromDialogState(state)
+
+        /** Make sure the dialog will close */
+        this.setState({
+            dialogNewNodeOpen: false
+        }, () => {
+            this.props.operationService.createNodeFromDialogState(state)
+        })
     }
 
     /**
@@ -242,8 +241,12 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         this.checkMoreElementsToDisplay(node)
 
         /** Make sure the menu will close */
-        this.state.coreContextMenuOpen = false
+
         this.saveView()
+
+        this.setState({
+            coreContextMenuOpen: false
+        })
     }
 
     /**
@@ -258,13 +261,16 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         let link = state.link
         this.saveLink(link)
 
-        /** Make sure the dialog will close */
-        this.state.dialogNewNodeToConnectOpen = false
-
         this.saveView()
 
         /** Update the external model */
-        this.props.operationService.createNodeWithLinkFromDialogState(state)
+        /** Make sure the dialog will close */
+        this.setState({
+            dialogNewNodeToConnectOpen: false
+        }, () => {
+            this.props.operationService.createNodeWithLinkFromDialogState(state)
+        })
+
     }
 
     /**
@@ -278,16 +284,19 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         this.saveNode(node)
 
         let link = GraphElementFactory.getGraphElementAsLink(
-            this.props.identityService.createNewLinkId(), this.state.tappedNode.id, state.link.target, VISIBILITY.VISIBLE)
+            this.props.identityService.createNewLinkId(), this.state.tappedNode.id, state.link.target, VISIBILITY.VISIBLE
+        )
 
         this.saveLink(link)
 
-        /** Make sure the dialog will close */
-        this.state.dialogSearchNodeToConnectOpen = false
-
         this.saveView()
         /** Update the external model */
-        this.props.operationService.createLink(state.link.id, this.state.tappedNode.id, state.link.target, state.nodeName)
+        /** Make sure the dialog will close */
+        this.setState({
+            dialogSearchNodeToConnectOpen: false
+        }, () => {
+            this.props.operationService.createLink(state.link.id, this.state.tappedNode.id, state.link.target, state.nodeName)
+        })
     }
 
     /**
@@ -505,9 +514,12 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         })
 
         /** Make sure all menus close */
-        this.state.nodeContextMenuOpen = false
-        this.state.coreContextMenuOpen = false
-        this.saveView()
+        this.setState({
+            nodeContextMenuOpen: false,
+            coreContextMenuOpen: false
+        }, () => {
+            this.saveView()
+        })
     }
 
     /**
@@ -521,18 +533,24 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
 
     /** Display the core context menu on a certain position */
     showCoreContextMenu(position: GraphPosition) {
-        this.state.tappedPosition = position
-        this.showCoreMenu()
+        this.setState({
+            tappedPosition: position
+        }, () => {
+            this.showCoreMenu();
+        })
     }
 
     /** Display the node context menu over a certain node */
     showNodeContextMenu(node: GraphNodeElement) {
 
         /** Save node information for further menu operations*/
-        this.state.tappedNode = node.data
-        this.state.tappedPosition = node.position
+        this.setState({
+            tappedNode: node.data,
+            tappedPosition: node.position
+        }, () => {
+            this.showNodeMenu();
+        })
 
-        this.showNodeMenu();
     }
 
     /**
@@ -665,8 +683,12 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
 
         })
         /** Make sure the collapse toolbar will hide */
-        this.state.collapseToolbarNeeded = false
-        this.saveView()
+
+        this.setState({
+            collapseToolbarNeeded: false
+        }, () => {
+            this.saveView()
+        })
     }
 
     /**
@@ -784,8 +806,6 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
     }
 
     render() {
-        this.initState()
-
         let nodes: GraphNodeElement[] = this.processNodesForGraph()
         let links: GraphLinkElement[] = this.processLinksForGraph()
 
@@ -802,8 +822,11 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
                         onNodeContextMenuRequested={this.showNodeContextMenu.bind(this)}
                         onLinkSelected={this.fromGraphLinkSelected.bind(this)}
                         onNodeDetailRequest={(node:GraphNodeData)=>{
-                                        this.state.tappedNode = node
-                                        this.nodeDetailRequested()
+                                        this.setState({
+                                            tappedNode: node
+                                        }, () => {
+                                            this.nodeDetailRequested()
+                                        })
                                     }}
                         identityService={this.props.identityService}
                     />
