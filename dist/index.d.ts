@@ -20,6 +20,7 @@ export * from "../src/model/GraphElement";
 export * from "../src/model/GraphElementFactory";
 export * from "../src/model/GraphLinkData";
 export * from "../src/model/GraphNodeData";
+export * from "../src/model/GraphNodeType";
 export * from "../src/model/GraphPosition";
 export * from "../src/model/View";
 export * from "../src/model/ViewFactory";
