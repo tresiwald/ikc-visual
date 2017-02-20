@@ -32,7 +32,16 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
     /**
      * Load the initial state
      */
-    componentWillReceiveProps = (nextProps:GraphScreenProps) => {
+
+    componentWillReceiveProps = (nextProps: GraphScreenProps) => {
+        this.initState(nextProps)
+    }
+
+    componentWillMount = () => {
+        this.initState(this.props)
+    }
+
+    initState = (props:GraphScreenProps) => {
         let nodes = new Map<string, GraphNodeElement>()
         let links = new Map<string, GraphLinkElement>()
 

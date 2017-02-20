@@ -40,9 +40,6 @@ export default class NodeContextMenu extends React.Component<NodeContextMenuProp
 
     }
 
-    initState() {
-    }
-
     /**
      * Before the component will mount, a event listener will be registered on the 'click' event. If there is a 'click' event
      * outside the context menu, it will disappear
@@ -143,7 +140,6 @@ export default class NodeContextMenu extends React.Component<NodeContextMenuProp
     }
 
     render() {
-        this.initState();
         const styles = {
             nodeContextMenu: {
                 left: this.props.position.x,

@@ -33,9 +33,6 @@ export default class CoreContextMenu extends React.Component<CoreContextMenuProp
 
     }
 
-    initState() {
-
-    }
     /**
      * Before the component will mount, a event listener will be registered on the 'click' event. If there is a 'click' event
      * outside the context menu, it will disappear.
@@ -115,8 +112,6 @@ export default class CoreContextMenu extends React.Component<CoreContextMenuProp
     }
 
     render() {
-        this.initState();
-
         const styles = {
             coreContextMenu: {
                 left: this.props.position.x,
