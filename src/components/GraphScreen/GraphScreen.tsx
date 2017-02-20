@@ -25,7 +25,8 @@ export default class GraphScreen extends React.Component<GraphScreenProps, Graph
         this.state = {
             nodes: new Map<string, GraphNodeElement>(),
             links: new Map<string, GraphLinkElement>(),
-            showLabels: false
+            showLabels: false,
+            tappedPosition: new GraphPosition(0,0)
         }
     }
 
