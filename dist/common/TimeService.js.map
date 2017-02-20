@@ -1,0 +1,1 @@
+{"version":3,"file":"TimeService.js","sourceRoot":"","sources":["../../src/common/TimeService.ts"],"names":[],"mappings":"AACA,gDAAgD;;AAEhD,IAAc,WAAW,CAQxB;AARD,WAAc,WAAW;IACrB;;;OAGG;IACH;QACI,MAAM,CAAC,CAAC,IAAI,IAAI,CAAC,CAAC,OAAO,EAAE,CAAC,QAAQ,EAAE,CAAA;IAC1C,CAAC;IAFe,wBAAY,eAE3B,CAAA;AACL,CAAC,EARa,WAAW,GAAX,mBAAW,KAAX,mBAAW,QAQxB"}
