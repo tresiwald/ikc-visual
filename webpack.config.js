@@ -2,6 +2,8 @@ module.exports = {
     entry: "./src/index.ts",
     output: {
         filename: "./dist/bundle.js",
+        library: 'ikc-visual',
+        libraryTarget: 'umd'
     },
 
     // Enable sourcemaps for debugging webpack's output.

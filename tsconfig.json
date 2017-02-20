@@ -6,6 +6,7 @@
     "module": "commonjs",
     "target": "es6",
     "jsx": "react",
+    "declaration": true,
     "typeRoots": [
       "/node_modules/@types/"
     ],
@@ -17,7 +18,8 @@
     ]
   },
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "dist"
   ],
   "include": [
      "src/*"
