@@ -569,7 +569,9 @@ class GraphScreen extends React.Component {
             nodes: new Map(),
             links: new Map(),
             showLabels: false,
-            tappedPosition: new GraphPosition_1.GraphPosition(0, 0)
+            tappedPosition: new GraphPosition_1.GraphPosition(0, 0),
+            nodeContextMenuOpen: false,
+            coreContextMenuOpen: false
         };
     }
     /**
